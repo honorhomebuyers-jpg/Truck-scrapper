@@ -1,0 +1,13 @@
+# Truck Parking Club listing URLs to track — one per line.
+# Lines starting with "#" and blank lines are ignored.
+# Add or remove URLs freely; the scraper picks up changes on its next run.
+https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819
+https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/17912-sotile-dr-70809
+https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd-70809
+https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6903-cezanne-ave-70806
+https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/2392-e-smiley-ave-70806
+https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7875-greenwell-springs-rd-70814
+https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7485-scenic-highway-70807
+https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6405-scenic-hwy-70807
+https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807
+https://truckparkingclub.com/truck-parking/louisiana/denham-springs/8350-florida-boulevard-70726
