@@ -41,6 +41,11 @@ HEADERS = {
 # $50/wk, 19000/plan 4 = $190/mo. Prices are in cents.
 PLAN_DURATIONS = {1: "hourly", 2: "daily", 3: "weekly", 4: "monthly"}
 
+# vehicle_type_allowed codes, verified against listing titles: listings with
+# [0] are titled "Truck and Trailer Parking", listings with [1] are titled
+# "Bobtail and Box Truck Parking".
+VEHICLE_TYPES = {0: "Truck + Trailer", 1: "Bobtail / Box Truck"}
+
 URL_RE = re.compile(
     r"truckparkingclub\.com/truck-parking/(?P<state>[^/]+)/(?P<city>[^/]+)/(?P<details>[^/?#]+)"
 )
@@ -57,6 +62,7 @@ CSV_COLUMNS = [
     "lat",
     "lng",
     "status",
+    "vehicle_type",
     "total_available",
     "total_spaces_manual",
     "reviews_count",
@@ -68,6 +74,21 @@ CSV_COLUMNS = [
     "price_monthly_usd",
     "prices_raw",
     "error",
+]
+
+# The trimmed, human-friendly columns written to the per-listing tables that
+# feed the Google Sheet tabs. history.csv always keeps every column.
+LISTING_COLUMNS = [
+    "scraped_at_utc",
+    "full_address",
+    "vehicle_type",
+    "total_available",
+    "total_spaces_manual",
+    "price_daily_usd",
+    "price_weekly_usd",
+    "price_monthly_usd",
+    "reviews_count",
+    "review_rating",
 ]
 
 
@@ -123,14 +144,42 @@ def write_per_listing_files(history_path: Path, listings_dir: Path) -> int:
     with history_path.open(newline="") as f:
         for row in csv.DictReader(f):
             if row.get("url"):
+                # Rows scraped before the vehicle_type column existed: the
+                # listing titles state the type, so recover it from there.
+                if not row.get("vehicle_type"):
+                    title = row.get("title") or ""
+                    if "Truck and Trailer" in title:
+                        row["vehicle_type"] = VEHICLE_TYPES[0]
+                    elif "Bobtail and Box Truck" in title:
+                        row["vehicle_type"] = VEHICLE_TYPES[1]
                 by_url.setdefault(row["url"], []).append(row)
     listings_dir.mkdir(exist_ok=True)
     for url, rows in by_url.items():
         with (listings_dir / f"{listing_slug(url)}.csv").open("w", newline="") as f:
-            writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS, extrasaction="ignore")
+            writer = csv.DictWriter(f, fieldnames=LISTING_COLUMNS, extrasaction="ignore")
             writer.writeheader()
             writer.writerows(rows)
     return len(by_url)
+
+
+def migrate_history_schema(history_path: Path) -> None:
+    """Rewrite history.csv in the current column layout if it predates it.
+
+    Rows keep their values by column name; columns added since are blank.
+    Keeps appends aligned when the schema gains a column (e.g. vehicle_type).
+    """
+    if not history_path.exists():
+        return
+    with history_path.open(newline="") as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames == CSV_COLUMNS:
+            return
+        rows = list(reader)
+    with history_path.open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS, extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({col: row.get(col, "") for col in CSV_COLUMNS})
 
 
 def load_manual_spaces(history_path: Path) -> dict[str, str]:
@@ -166,6 +215,10 @@ def to_row(url: str, listing: dict, scraped_at: str) -> dict:
         "lat": listing.get("lat"),
         "lng": listing.get("lng"),
         "status": listing.get("status"),
+        "vehicle_type": " & ".join(
+            VEHICLE_TYPES.get(v, f"type {v}")
+            for v in listing.get("vehicle_type_allowed") or []
+        ),
         "total_available": total_available,
         "total_spaces_manual": "",
         "reviews_count": listing.get("reviews_count"),
@@ -202,6 +255,7 @@ def main() -> int:
     latest_path = data_dir / "latest.json"
 
     scraped_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    migrate_history_schema(history_path)
     manual_spaces = load_manual_spaces(history_path)
     rows, failures = [], 0
     for url in urls:
