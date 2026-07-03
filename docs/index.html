@@ -166,18 +166,35 @@
 <script>
 (() => {
   const OWNER = 'honorhomebuyers-jpg', REPO = 'Truck-scrapper';
-  const BRANCH = new URLSearchParams(location.search).get('branch') || 'main';
-  const RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/scraper/`;
-  const BLOB = `https://github.com/${OWNER}/${REPO}/blob/${BRANCH}/scraper/`;
+  // Branches checked in order for occupancy data; the first one that has it
+  // wins, so no ?branch= is ever needed (it still works as an override).
+  const DATA_BRANCHES = ['main', 'claude/occupancy-booking-tracking-pxtt5s'];
+  let BRANCH = 'main', RAW = '', BLOB = '';
 
   const $ = id => document.getElementById(id);
   const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-  $('lnkHistory').href = BLOB + 'data/history.csv';
-  $('lnkEvents').href  = BLOB + 'data/events.csv';
-  $('lnkReviews').href = BLOB + 'data/reviews.csv';
-  $('lnkRepo').href    = `https://github.com/${OWNER}/${REPO}`;
+  async function pickBranch() {
+    const forced = new URLSearchParams(location.search).get('branch');
+    if (forced) { BRANCH = forced; }
+    else {
+      for (const br of DATA_BRANCHES) {
+        try {
+          const res = await fetch(
+            `https://raw.githubusercontent.com/${OWNER}/${REPO}/${br}/scraper/data/events.csv`,
+            {method: 'HEAD', cache: 'no-store'});
+          if (res.ok) { BRANCH = br; break; }
+        } catch {}
+      }
+    }
+    RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/scraper/`;
+    BLOB = `https://github.com/${OWNER}/${REPO}/blob/${BRANCH}/scraper/`;
+    $('lnkHistory').href = BLOB + 'data/history.csv';
+    $('lnkEvents').href  = BLOB + 'data/events.csv';
+    $('lnkReviews').href = BLOB + 'data/reviews.csv';
+    $('lnkRepo').href    = `https://github.com/${OWNER}/${REPO}`;
+  }
 
   // ---- fetching + CSV parsing -------------------------------------------
   async function fetchText(path) {
@@ -312,6 +329,7 @@
 
   // ---- main --------------------------------------------------------------
   async function init() {
+    await pickBranch();
     const [historyT, latestT, eventsT, reviewsT, marketsT] = await Promise.all([
       fetchText('data/history.csv'), fetchText('data/latest.json'),
       fetchText('data/events.csv'), fetchText('data/reviews.csv'),
