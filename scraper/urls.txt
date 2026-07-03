@@ -11,3 +11,10 @@ https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7485-scenic-hig
 https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6405-scenic-hwy-70807
 https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807
 https://truckparkingclub.com/truck-parking/louisiana/denham-springs/8350-florida-boulevard-70726
+
+# auto-discovered 2026-07-03 by market sweep
+https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/1700-scenic-hwy-70802
+https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd-70809-bobtails
+
+# auto-discovered 2026-07-03 by market sweep
+https://truckparkingclub.com/truck-parking/louisiana/denham-springs/23286-springhill-dr-70726

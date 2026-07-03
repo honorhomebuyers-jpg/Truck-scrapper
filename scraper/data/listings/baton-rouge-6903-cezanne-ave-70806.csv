@@ -1,7 +1,8 @@
-scraped_at_utc,full_address,vehicle_type,total_available,total_spaces_manual,price_daily_usd,price_weekly_usd,price_monthly_usd,reviews_count,review_rating
-,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,8.00,41.00,130.00,,
-,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,8.00,41.00,130.00,,
-,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,8.00,41.00,130.00,,
-,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,8.00,41.00,130.00,,
-2026-07-03T18:20:34Z,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,8.00,41.00,130.00,,
-2026-07-03T18:57:51Z,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,8.00,41.00,130.00,,
+scraped_at_utc,full_address,vehicle_type,total_available,total_spaces_manual,capacity_est,occupied_est,occupancy_pct_est,booking_amount_label,price_daily_usd,price_weekly_usd,price_monthly_usd,reviews_count,review_rating
+,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,,,,,8.00,41.00,130.00,,
+,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,,,,,8.00,41.00,130.00,,
+,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,,,,,8.00,41.00,130.00,,
+,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,,,,,8.00,41.00,130.00,,
+2026-07-03T18:20:34Z,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,,,,,8.00,41.00,130.00,,
+2026-07-03T18:57:51Z,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,,,,,8.00,41.00,130.00,,
+2026-07-03T20:41:14Z,"6903 Cezanne Ave, Baton Rouge, LA 70806 ",Bobtail / Box Truck,11,,11,0,0.0,,8.00,41.00,130.00,,
