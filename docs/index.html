@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Truck Parking — Occupancy &amp; Bookings</title>
+<style>
+  :root {
+    --page:        #f9f9f7;
+    --surface:     #fcfcfb;
+    --ink:         #0b0b0b;
+    --ink-2:       #52514e;
+    --muted:       #898781;
+    --grid:        #e1e0d9;
+    --baseline:    #c3c2b7;
+    --border:      rgba(11,11,11,0.10);
+    --series-1:    #2a78d6;
+    --series-1-soft: #cde2fb;
+    --series-2:    #1baf7a;
+    --good:        #006300;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page:        #0d0d0d;
+      --surface:     #1a1a19;
+      --ink:         #ffffff;
+      --ink-2:       #c3c2b7;
+      --muted:       #898781;
+      --grid:        #2c2c2a;
+      --baseline:    #383835;
+      --border:      rgba(255,255,255,0.10);
+      --series-1:    #3987e5;
+      --series-1-soft: #10325c;
+      --series-2:    #199e70;
+      --good:        #0ca30c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page); color: var(--ink);
+    font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 20px 16px 48px; }
+  header h1 { font-size: 20px; margin: 0 0 2px; }
+  header .sub { color: var(--ink-2); font-size: 13px; margin: 0 0 18px; }
+  .banner {
+    display: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; color: var(--ink-2); margin-bottom: 16px;
+  }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .tile .v { font-size: 26px; font-weight: 650; letter-spacing: -0.02em; }
+  .tile .l { color: var(--ink-2); font-size: 12px; margin-top: 2px; }
+  .tile .d { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .card h2 { font-size: 14px; margin: 0 0 2px; }
+  .card .note { color: var(--muted); font-size: 12px; margin: 0 0 12px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; }
+  .filters select {
+    font: inherit; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--baseline); border-radius: 6px; padding: 5px 8px; max-width: 100%;
+  }
+  .rangebtns { display: flex; gap: 0; border: 1px solid var(--baseline); border-radius: 6px; overflow: hidden; }
+  .rangebtns button {
+    font: inherit; font-size: 12px; padding: 5px 10px; border: 0; cursor: pointer;
+    background: transparent; color: var(--ink-2);
+  }
+  .rangebtns button + button { border-left: 1px solid var(--baseline); }
+  .rangebtns button.on { background: var(--series-1); color: #fff; }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--ink-2); margin-top: 8px; }
+  .legend .chip { display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+  .chartbox { position: relative; }
+  .chartbox svg { display: block; width: 100%; height: auto; }
+  #tooltip {
+    position: fixed; z-index: 10; pointer-events: none; display: none;
+    background: var(--ink); color: var(--page); border-radius: 6px;
+    padding: 6px 9px; font-size: 12px; max-width: 260px; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  }
+  #tooltip .t { opacity: .7; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 7px 10px 7px 0; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  th { color: var(--muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  td.num, th.num { text-align: right; padding-right: 14px; }
+  .scroll { overflow-x: auto; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 820px) { .cols { grid-template-columns: 1fr; } }
+  .feed { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+  .feed li { padding: 8px 0; border-bottom: 1px solid var(--grid); }
+  .feed .when { color: var(--muted); font-size: 12px; }
+  .feed .who { color: var(--ink-2); }
+  .delta-booked { color: var(--series-1); font-weight: 650; }
+  .delta-freed { color: var(--ink-2); font-weight: 650; }
+  .stars { color: var(--ink-2); letter-spacing: 1px; }
+  .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr 46px; gap: 8px; align-items: center; padding: 3px 0; font-size: 13px; }
+  .bar-row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
+  .bar-track { position: relative; height: 18px; }
+  .bar-fill { position: absolute; inset: 0 auto 0 0; background: var(--series-1); border-radius: 0 4px 4px 0; min-width: 2px; }
+  .bar-val { text-align: right; font-variant-numeric: tabular-nums; padding-right: 4px; }
+  .mkt-title { font-weight: 650; margin: 14px 0 6px; font-size: 13px; }
+  .mkt-title:first-child { margin-top: 0; }
+  .empty { color: var(--muted); padding: 10px 0; }
+  footer { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  footer a { color: var(--ink-2); }
+  .occ-hi { font-weight: 650; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Truck Parking — Occupancy &amp; Bookings</h1>
+    <p class="sub" id="updated">Loading…</p>
+  </header>
+
+  <div class="banner" id="banner"></div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="card">
+    <h2>Available spots over time</h2>
+    <p class="note">Sum across tracked listings, one point per scrape. A drop means spots were booked; a rise means bookings ended.</p>
+    <div class="filters">
+      <select id="listingSel" aria-label="Listing"></select>
+      <div class="rangebtns" id="rangeBtns" role="group" aria-label="Date range">
+        <button data-d="7">7d</button><button data-d="30" class="on">30d</button><button data-d="90">90d</button><button data-d="0">All</button>
+      </div>
+    </div>
+    <div class="chartbox" id="lineChart"><div class="empty">Loading…</div></div>
+    <div class="legend" id="lineLegend"></div>
+  </div>
+
+  <div class="card">
+    <h2>Current snapshot</h2>
+    <p class="note">Latest scrape, per listing. Capacity is the hand-entered total or the highest availability ever observed (a floor), so occupancy is a lower bound until capacities are typed in.</p>
+    <div class="scroll"><table id="snapTable"></table></div>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h2>Booking activity</h2>
+      <p class="note">Run-over-run changes from <code>events.csv</code>. Newest first.</p>
+      <ul class="feed" id="eventsFeed"><li class="empty">Loading…</li></ul>
+    </div>
+    <div class="card">
+      <h2>Recent reviews <span style="font-weight:400;color:var(--muted)">(each = one completed booking)</span></h2>
+      <p class="note">Every review is tied to a booking id — dated proof of bookings.</p>
+      <ul class="feed" id="reviewsFeed"><li class="empty">Loading…</li></ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Markets — availability by listing</h2>
+    <p class="note">Every listing in each swept city, latest run. Open spots per listing; label direct on the row.</p>
+    <div id="markets"><div class="empty">Loading…</div></div>
+  </div>
+
+  <footer>
+    Data updates automatically via GitHub Actions.
+    Raw tables: <a id="lnkHistory" href="#">history</a> ·
+    <a id="lnkEvents" href="#">events</a> ·
+    <a id="lnkReviews" href="#">reviews</a> ·
+    <a id="lnkRepo" href="#">repository</a>
+  </footer>
+</div>
+<div id="tooltip"></div>
+
+<script>
+(() => {
+  const OWNER = 'honorhomebuyers-jpg', REPO = 'Truck-scrapper';
+  const BRANCH = new URLSearchParams(location.search).get('branch') || 'main';
+  const RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/scraper/`;
+  const BLOB = `https://github.com/${OWNER}/${REPO}/blob/${BRANCH}/scraper/`;
+
+  const $ = id => document.getElementById(id);
+  const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  $('lnkHistory').href = BLOB + 'data/history.csv';
+  $('lnkEvents').href  = BLOB + 'data/events.csv';
+  $('lnkReviews').href = BLOB + 'data/reviews.csv';
+  $('lnkRepo').href    = `https://github.com/${OWNER}/${REPO}`;
+
+  // ---- fetching + CSV parsing -------------------------------------------
+  async function fetchText(path) {
+    try {
+      const res = await fetch(RAW + path, {cache: 'no-store'});
+      return res.ok ? await res.text() : null;
+    } catch { return null; }
+  }
+  function parseCSV(text) {
+    if (!text) return [];
+    const rows = []; let row = [], field = '', inQ = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQ) {
+        if (c === '"') { if (text[i+1] === '"') { field += '"'; i++; } else inQ = false; }
+        else field += c;
+      } else if (c === '"') inQ = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i+1] === '\n') i++;
+        row.push(field); field = '';
+        if (row.length > 1 || row[0] !== '') rows.push(row);
+        row = [];
+      } else field += c;
+    }
+    if (field !== '' || row.length) { row.push(field); rows.push(row); }
+    if (!rows.length) return [];
+    const head = rows[0];
+    return rows.slice(1).map(r => Object.fromEntries(head.map((h, i) => [h, r[i] ?? ''])));
+  }
+
+  // ---- helpers -----------------------------------------------------------
+  const shortName = url => {
+    const m = /truck-parking\/[^/]+\/([^/]+)\/([^/?#]+)/.exec(url || '');
+    if (!m) return url || '';
+    return m[2].replace(/-\d{5}(?=-|$)/, '').replace(/-/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase()) + ' (' + m[1].replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) + ')';
+  };
+  const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : null; };
+  const fmtDate = d => d.toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+  const fmtDateTime = d => d.toLocaleString(undefined, {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'});
+  const money = v => v ? '$' + (+v % 1 ? (+v).toFixed(2) : (+v).toFixed(0)) : '—';
+
+  const tooltip = $('tooltip');
+  function showTip(html, x, y) {
+    tooltip.innerHTML = html; tooltip.style.display = 'block';
+    const r = tooltip.getBoundingClientRect();
+    tooltip.style.left = Math.min(x + 12, innerWidth - r.width - 8) + 'px';
+    tooltip.style.top = Math.max(8, y - r.height - 10) + 'px';
+  }
+  const hideTip = () => tooltip.style.display = 'none';
+
+  // ---- line chart (SVG, crosshair tooltip) ------------------------------
+  function renderLine(el, legendEl, series, opts = {}) {
+    // series: [{name, color, dash, points:[{t:Date, v:number}]}]
+    el.innerHTML = '';
+    const withData = series.filter(s => s.points.length);
+    if (!withData.length) { el.innerHTML = '<div class="empty">No data in this range yet.</div>'; legendEl.innerHTML = ''; return; }
+    const W = el.clientWidth || 900, H = 260, m = {t: 14, r: 56, b: 26, l: 34};
+    const all = withData.flatMap(s => s.points);
+    const t0 = Math.min(...all.map(p => +p.t)), t1 = Math.max(...all.map(p => +p.t));
+    let v1 = Math.max(...all.map(p => p.v), 1);
+    const v0 = 0; v1 = Math.ceil(v1 * 1.12);
+    const X = t => m.l + (t1 === t0 ? 0.5 : (t - t0) / (t1 - t0)) * (W - m.l - m.r);
+    const Y = v => m.t + (1 - (v - v0) / (v1 - v0)) * (H - m.t - m.b);
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const add = (tag, attrs, parent = svg) => {
+      const n = document.createElementNS(svgNS, tag);
+      for (const k in attrs) n.setAttribute(k, attrs[k]);
+      parent.appendChild(n); return n;
+    };
+    // grid + y ticks
+    const ticks = 4;
+    for (let i = 0; i <= ticks; i++) {
+      const v = v0 + (v1 - v0) * i / ticks, y = Y(v);
+      add('line', {x1: m.l, x2: W - m.r, y1: y, y2: y, stroke: css('--grid'), 'stroke-width': 1});
+      add('text', {x: m.l - 6, y: y + 4, 'text-anchor': 'end', fill: css('--muted'), 'font-size': 11}).textContent = Math.round(v);
+    }
+    // x ticks: ~5 dates; include the time when the whole span is under 3 days
+    const shortSpan = (t1 - t0) < 3 * 864e5;
+    const nx = Math.min(shortSpan ? 4 : 5, Math.max(2, Math.round(W / (shortSpan ? 220 : 180))));
+    for (let i = 0; i <= nx; i++) {
+      const t = t0 + (t1 - t0) * i / nx;
+      const anchor = i === 0 ? 'start' : i === nx ? 'end' : 'middle';
+      add('text', {x: X(t) + (i === 0 ? -m.l + 4 : 0), y: H - 8, 'text-anchor': anchor, fill: css('--muted'), 'font-size': 11})
+        .textContent = shortSpan ? fmtDateTime(new Date(t)) : fmtDate(new Date(t));
+    }
+    add('line', {x1: m.l, x2: W - m.r, y1: Y(0), y2: Y(0), stroke: css('--baseline'), 'stroke-width': 1});
+    // series paths
+    const labelYs = [];
+    for (const s of withData) {
+      const d = s.points.map((p, i) => (i ? 'L' : 'M') + X(+p.t).toFixed(1) + ' ' + Y(p.v).toFixed(1)).join(' ');
+      add('path', {d, fill: 'none', stroke: s.color, 'stroke-width': 2,
+                   'stroke-dasharray': s.dash || 'none', 'stroke-linejoin': 'round', 'stroke-linecap': 'round'});
+      // direct label at last point, nudged up if it would collide with another
+      const last = s.points[s.points.length - 1];
+      let ly = Y(last.v) + 4;
+      while (labelYs.some(y => Math.abs(y - ly) < 13)) ly -= 13;
+      labelYs.push(ly);
+      add('text', {x: X(+last.t) + 6, y: ly, fill: s.labelColor || s.color, 'font-size': 11, 'font-weight': 600})
+        .textContent = last.v;
+    }
+    // crosshair layer
+    const cross = add('line', {x1: 0, x2: 0, y1: m.t, y2: H - m.b, stroke: css('--baseline'), 'stroke-width': 1, opacity: 0});
+    const dots = withData.map(s => add('circle', {r: 4, fill: s.color, stroke: css('--surface'), 'stroke-width': 2, opacity: 0}));
+    const times = [...new Set(all.map(p => +p.t))].sort((a, b) => a - b);
+    svg.addEventListener('pointermove', e => {
+      const rect = svg.getBoundingClientRect();
+      const t = t0 + (t1 - t0) * ((e.clientX - rect.left) / rect.width * W - m.l) / (W - m.l - m.r);
+      let best = times[0];
+      for (const tt of times) if (Math.abs(tt - t) < Math.abs(best - t)) best = tt;
+      const x = X(best);
+      cross.setAttribute('x1', x); cross.setAttribute('x2', x); cross.setAttribute('opacity', 1);
+      let html = `<div class="t">${fmtDateTime(new Date(best))}</div>`;
+      withData.forEach((s, i) => {
+        const p = s.points.reduce((a, b) => Math.abs(+b.t - best) < Math.abs(+a.t - best) ? b : a);
+        dots[i].setAttribute('cx', X(+p.t)); dots[i].setAttribute('cy', Y(p.v)); dots[i].setAttribute('opacity', 1);
+        html += `<div>${esc(s.name)}: <b>${p.v}</b></div>`;
+      });
+      showTip(html, e.clientX, e.clientY);
+    });
+    svg.addEventListener('pointerleave', () => {
+      cross.setAttribute('opacity', 0); dots.forEach(d => d.setAttribute('opacity', 0)); hideTip();
+    });
+    el.appendChild(svg);
+    legendEl.innerHTML = withData.length > 1
+      ? withData.map(s => `<span><span class="chip" style="background:${s.color};${s.dash ? 'height:0;border-top:2px dashed ' + s.color + ';background:none;' : ''}"></span>${esc(s.name)}</span>`).join('')
+      : '';
+  }
+
+  // ---- main --------------------------------------------------------------
+  async function init() {
+    const [historyT, latestT, eventsT, reviewsT, marketsT] = await Promise.all([
+      fetchText('data/history.csv'), fetchText('data/latest.json'),
+      fetchText('data/events.csv'), fetchText('data/reviews.csv'),
+      fetchText('markets.txt'),
+    ]);
+    if (!historyT) {
+      const b = $('banner');
+      b.style.display = 'block';
+      b.textContent = `No data found on branch "${BRANCH}" yet — the dashboard fills in after the first scheduled scrape lands there.`;
+    }
+    const history = parseCSV(historyT).filter(r => r.url && !r.error);
+    let latest = {}; try { latest = JSON.parse(latestT) || {}; } catch {}
+    const events = parseCSV(eventsT);
+    const reviews = parseCSV(reviewsT);
+
+    const latestRows = Object.values(latest).filter(r => r.url && !r.error);
+    const lastTime = latestRows.map(r => r.scraped_at_utc).sort().pop();
+    $('updated').textContent = lastTime
+      ? `Last scrape: ${fmtDateTime(new Date(lastTime))} · ${latestRows.length} listings tracked · data branch: ${BRANCH}`
+      : 'No snapshot yet.';
+
+    // tiles
+    const openNow = latestRows.reduce((a, r) => a + (num(r.total_available) ?? 0), 0);
+    const capRows = latestRows.filter(r => num(r.capacity_est) != null);
+    const capSum = capRows.reduce((a, r) => a + num(r.capacity_est), 0);
+    const occSum = capRows.reduce((a, r) => a + (num(r.occupied_est) ?? 0), 0);
+    const cutoff7 = Date.now() - 7 * 864e5;
+    const booked7 = events.filter(e => e.metric === 'total_available' && +e.change < 0 && +new Date(e.scraped_at_utc) > cutoff7)
+                          .reduce((a, e) => a - +e.change, 0);
+    const tiles = [
+      {v: openNow, l: 'Spots open now', d: 'across tracked listings'},
+      {v: capSum ? (occSum / capSum * 100).toFixed(0) + '%' : '—', l: 'Occupancy (est.)', d: capSum ? `${occSum} of ${capSum} known spaces` : 'needs capacity data'},
+      {v: booked7, l: 'Spots booked, last 7 days', d: 'from run-over-run drops'},
+      {v: reviews.length, l: 'Bookings proven by reviews', d: 'all-time, review ledger'},
+      {v: latestRows.length, l: 'Listings tracked', d: 'incl. auto-discovered'},
+    ];
+    $('tiles').innerHTML = tiles.map(t =>
+      `<div class="tile"><div class="v">${esc(t.v)}</div><div class="l">${esc(t.l)}</div><div class="d">${esc(t.d)}</div></div>`).join('');
+
+    // listing selector
+    const urls = [...new Set(history.map(r => r.url))];
+    $('listingSel').innerHTML = `<option value="">All listings (total)</option>` +
+      urls.map(u => `<option value="${esc(u)}">${esc(shortName(u))}</option>`).join('');
+
+    let rangeDays = 30;
+    const drawChart = () => {
+      const sel = $('listingSel').value;
+      const cut = rangeDays ? Date.now() - rangeDays * 864e5 : 0;
+      let rows = history.filter(r => +new Date(r.scraped_at_utc) > cut && r.scraped_at_utc);
+      let avail = [], cap = [];
+      if (sel) {
+        rows = rows.filter(r => r.url === sel);
+        avail = rows.map(r => ({t: new Date(r.scraped_at_utc), v: num(r.total_available)})).filter(p => p.v != null);
+        cap = rows.map(r => ({t: new Date(r.scraped_at_utc), v: num(r.capacity_est)})).filter(p => p.v != null);
+      } else {
+        const byT = {};
+        for (const r of rows) {
+          const k = r.scraped_at_utc;
+          (byT[k] ??= {a: 0, c: 0, n: 0, nc: 0});
+          const a = num(r.total_available); if (a != null) { byT[k].a += a; byT[k].n++; }
+          const c = num(r.capacity_est); if (c != null) { byT[k].c += c; byT[k].nc++; }
+        }
+        for (const k of Object.keys(byT).sort()) {
+          avail.push({t: new Date(k), v: byT[k].a});
+          if (byT[k].nc && byT[k].nc === byT[k].n) cap.push({t: new Date(k), v: byT[k].c});
+        }
+      }
+      avail.sort((a, b) => a.t - b.t); cap.sort((a, b) => a.t - b.t);
+      const series = [{name: 'Available spots', color: css('--series-1'), points: avail}];
+      if (cap.length) series.push({name: 'Capacity (est.)', color: css('--muted'), labelColor: css('--muted'), dash: '5 4', points: cap});
+      renderLine($('lineChart'), $('lineLegend'), series);
+    };
+    $('listingSel').addEventListener('change', drawChart);
+    $('rangeBtns').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      rangeDays = +b.dataset.d;
+      [...$('rangeBtns').children].forEach(x => x.classList.toggle('on', x === b));
+      drawChart();
+    });
+    let rsz; addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(drawChart, 150); });
+    drawChart();
+
+    // snapshot table
+    const snap = latestRows.slice().sort((a, b) => (num(b.occupancy_pct_est) ?? -1) - (num(a.occupancy_pct_est) ?? -1));
+    $('snapTable').innerHTML =
+      `<tr><th>Listing</th><th>Type</th><th class="num">Open</th><th class="num">Capacity</th><th class="num">Occupancy</th>` +
+      `<th class="num">Day</th><th class="num">Week</th><th class="num">Month</th><th>Bookings</th><th class="num">Rating</th></tr>` +
+      snap.map(r => {
+        const occ = num(r.occupancy_pct_est);
+        return `<tr><td><a href="${esc(r.url)}" style="color:inherit">${esc(shortName(r.url))}</a></td>` +
+          `<td>${esc(r.vehicle_type || '')}</td>` +
+          `<td class="num">${esc(r.total_available ?? '')}</td>` +
+          `<td class="num">${esc(r.capacity_est || '—')}</td>` +
+          `<td class="num${occ >= 50 ? ' occ-hi' : ''}">${occ != null ? occ.toFixed(0) + '%' : '—'}</td>` +
+          `<td class="num">${money(r.price_daily_usd)}</td><td class="num">${money(r.price_weekly_usd)}</td><td class="num">${money(r.price_monthly_usd)}</td>` +
+          `<td>${esc(r.booking_amount_label || '—')}</td>` +
+          `<td class="num">${r.review_rating ? (+r.review_rating).toFixed(1) + '★' : '—'}</td></tr>`;
+      }).join('');
+
+    // events feed
+    const evShow = events.slice(-40).reverse();
+    $('eventsFeed').innerHTML = evShow.length ? evShow.map(e => {
+      let what;
+      if (e.metric === 'total_available') {
+        const d = +e.change;
+        what = d < 0
+          ? `<span class="delta-booked">▼ ${-d} spot${-d > 1 ? 's' : ''} booked</span> (${e.previous} → ${e.current} open)`
+          : `<span class="delta-freed">▲ ${d} spot${d > 1 ? 's' : ''} freed</span> (${e.previous} → ${e.current} open)`;
+      } else if (e.metric.startsWith('price_')) {
+        what = `${esc(e.metric.replace('price_', '').replace('_usd', ''))} price ${+e.current > +e.previous ? 'raised' : 'lowered'}: ${money(e.previous)} → ${money(e.current)}`;
+      } else if (e.metric === 'booking_amount_label') {
+        what = `bookings badge: ${esc(e.previous || '–')} → <b>${esc(e.current)}</b>`;
+      } else {
+        what = `${esc(e.metric)}: ${esc(e.previous)} → ${esc(e.current)}`;
+      }
+      return `<li><div>${what}</div><div class="when">${fmtDateTime(new Date(e.scraped_at_utc))} · ${esc(shortName(e.url))}</div></li>`;
+    }).join('') : '<li class="empty">No change events yet — they appear once two runs can be compared.</li>';
+
+    // reviews feed
+    const rvShow = reviews.slice().sort((a, b) => (b.review_date_utc || '').localeCompare(a.review_date_utc || '')).slice(0, 10);
+    $('reviewsFeed').innerHTML = rvShow.length ? rvShow.map(r => {
+      const stars = '★'.repeat(Math.round(+r.rating || 0)) + '☆'.repeat(Math.max(0, 5 - Math.round(+r.rating || 0)));
+      const cmt = (r.comment || '').trim();
+      return `<li><div><span class="stars">${stars}</span> <span class="who">${esc(r.reviewer || 'Anonymous')}</span>` +
+        `${cmt ? ' — ' + esc(cmt.length > 120 ? cmt.slice(0, 120) + '…' : cmt) : ''}</div>` +
+        `<div class="when">${r.review_date_utc ? fmtDate(new Date(r.review_date_utc)) : ''} · booking #${esc(r.booking_id)} · ${esc(shortName(r.url))}</div></li>`;
+    }).join('') : '<li class="empty">No reviews captured yet.</li>';
+
+    // markets
+    const mktLines = (marketsT || '').split('\n').map(s => s.trim()).filter(s => s && !s.startsWith('#') && s.includes('/'));
+    const mktEl = $('markets');
+    if (!mktLines.length) { mktEl.innerHTML = '<div class="empty">No markets configured.</div>'; return; }
+    mktEl.innerHTML = '';
+    for (const line of mktLines) {
+      const [st, city] = line.split('/');
+      const t = await fetchText(`data/markets/${st}-${city}.csv`);
+      const rows = parseCSV(t);
+      const box = document.createElement('div');
+      const title = city.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) + ', ' + st.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      if (!rows.length) {
+        box.innerHTML = `<div class="mkt-title">${esc(title)}</div><div class="empty">No sweep data yet.</div>`;
+        mktEl.appendChild(box); continue;
+      }
+      const lastT = rows.map(r => r.scraped_at_utc).sort().pop();
+      const cur = rows.filter(r => r.scraped_at_utc === lastT)
+                      .sort((a, b) => (num(b.total_available) ?? 0) - (num(a.total_available) ?? 0));
+      const maxV = Math.max(...cur.map(r => num(r.total_available) ?? 0), 1);
+      const total = cur.reduce((a, r) => a + (num(r.total_available) ?? 0), 0);
+      box.innerHTML = `<div class="mkt-title">${esc(title)} — ${cur.length} listings, ${total} spots open</div>` +
+        cur.map(r => {
+          const v = num(r.total_available) ?? 0;
+          return `<div class="bar-row" data-tip="${esc(shortName(r.url))}: ${v} open · day ${money(r.price_daily_usd)} · month ${money(r.price_monthly_usd)}">` +
+            `<div class="name">${esc(shortName(r.url))}</div>` +
+            `<div class="bar-track"><div class="bar-fill" style="width:${(v / maxV * 100).toFixed(1)}%"></div></div>` +
+            `<div class="bar-val">${v}</div></div>`;
+        }).join('');
+      mktEl.appendChild(box);
+    }
+    mktEl.addEventListener('pointermove', e => {
+      const row = e.target.closest('.bar-row');
+      if (row) showTip(esc(row.dataset.tip), e.clientX, e.clientY); else hideTip();
+    });
+    mktEl.addEventListener('pointerleave', hideTip);
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

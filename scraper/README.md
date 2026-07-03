@@ -85,6 +85,16 @@ column on any row for a listing (the latest row is easiest); every future run
 copies the most recent value you entered forward automatically, so each
 listing only needs it typed once (re-enter to change it).
 
+## Dashboard
+
+`docs/index.html` is a self-updating dashboard (occupancy over time, current
+snapshot, booking activity feed, review ledger, market availability). It is
+published by `.github/workflows/deploy-pages.yml` to GitHub Pages at
+`https://honorhomebuyers-jpg.github.io/Truck-scrapper/` once this lands on
+`main` — no manual Pages setup needed. The page fetches the CSVs straight from
+the repository in the browser, so it shows fresh data on every scrape without
+redeploying, from any device.
+
 ## Running it
 
 ```bash
