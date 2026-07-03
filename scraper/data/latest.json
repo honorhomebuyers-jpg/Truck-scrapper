@@ -1,6 +1,6 @@
 {
   "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819": {
-    "scraped_at_utc": "2026-07-03T12:06:10Z",
+    "scraped_at_utc": "2026-07-03T17:54:10Z",
     "url": "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819",
     "listing_id": 9125,
     "title": "Baton Rouge, LA Truck and Trailer Parking on 14015 Florida Blvd",
@@ -24,7 +24,7 @@
     "price_monthly_usd": "190.00"
   },
   "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/17912-sotile-dr-70809": {
-    "scraped_at_utc": "2026-07-03T12:06:10Z",
+    "scraped_at_utc": "2026-07-03T17:54:10Z",
     "url": "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/17912-sotile-dr-70809",
     "listing_id": 7748,
     "title": "Baton Rouge, LA Truck & Trailer Parking off of Sotile Dr.",
@@ -48,7 +48,7 @@
     "price_monthly_usd": "350.00"
   },
   "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd-70809": {
-    "scraped_at_utc": "2026-07-03T12:06:10Z",
+    "scraped_at_utc": "2026-07-03T17:54:10Z",
     "url": "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd-70809",
     "listing_id": 8388,
     "title": "Baton Rouge, LA Truck & Trailer Parking off of Reiger Rd.",
@@ -72,7 +72,7 @@
     "price_monthly_usd": "280.00"
   },
   "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6903-cezanne-ave-70806": {
-    "scraped_at_utc": "2026-07-03T12:06:10Z",
+    "scraped_at_utc": "2026-07-03T17:54:10Z",
     "url": "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6903-cezanne-ave-70806",
     "listing_id": 10594,
     "title": "Baton Rouge, LA Bobtail and Box Truck Parking on Cezanne Ave. Use GPS Coordinates",
@@ -96,7 +96,7 @@
     "price_monthly_usd": "130.00"
   },
   "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/2392-e-smiley-ave-70806": {
-    "scraped_at_utc": "2026-07-03T12:06:10Z",
+    "scraped_at_utc": "2026-07-03T17:54:10Z",
     "url": "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/2392-e-smiley-ave-70806",
     "listing_id": 3966,
     "title": "Baton Rouge, LA Truck and Trailer Parking on 2392 E Smiley Ave   ",
@@ -107,11 +107,11 @@
     "lat": "30.46959",
     "lng": "-91.12347",
     "status": 1,
-    "total_available": 5,
+    "total_available": 4,
     "total_spaces_manual": "",
     "reviews_count": 16,
     "review_rating": 4.94,
-    "available_seats_raw": "[{\"vehicle_types\":[3,1,2],\"seats\":5}]",
+    "available_seats_raw": "[{\"vehicle_types\":[3,1,2],\"seats\":4}]",
     "prices_raw": "[{\"price_id\":20652,\"price\":2000,\"plan_duration\":2,\"vehicle_type\":0},{\"price_id\":20653,\"price\":10000,\"plan_duration\":3,\"vehicle_type\":0},{\"price_id\":20654,\"price\":35000,\"plan_duration\":4,\"vehicle_type\":0}]",
     "error": "",
     "price_hourly_usd": "",
@@ -120,7 +120,7 @@
     "price_monthly_usd": "350.00"
   },
   "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7875-greenwell-springs-rd-70814": {
-    "scraped_at_utc": "2026-07-03T12:06:10Z",
+    "scraped_at_utc": "2026-07-03T17:54:10Z",
     "url": "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7875-greenwell-springs-rd-70814",
     "listing_id": 8912,
     "title": "Baton Rouge, LA Bobtail and Box Truck Parking on 7875 Greenwell Springs Rd Follow GPS Coordinates To Entrance",
@@ -144,7 +144,7 @@
     "price_monthly_usd": "500.00"
   },
   "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7485-scenic-highway-70807": {
-    "scraped_at_utc": "2026-07-03T12:06:10Z",
+    "scraped_at_utc": "2026-07-03T17:54:10Z",
     "url": "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7485-scenic-highway-70807",
     "listing_id": 15246,
     "title": "Baton Rouge, LA Bobtail and Box Truck Parking on 7485 Scenic Highway",
@@ -168,7 +168,7 @@
     "price_monthly_usd": "175.00"
   },
   "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6405-scenic-hwy-70807": {
-    "scraped_at_utc": "2026-07-03T12:06:10Z",
+    "scraped_at_utc": "2026-07-03T17:54:10Z",
     "url": "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6405-scenic-hwy-70807",
     "listing_id": 7400,
     "title": "Baton Rouge, LA Truck and Trailer Parking on 6405 Scenic Hwy",
@@ -192,7 +192,7 @@
     "price_monthly_usd": "275.00"
   },
   "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807": {
-    "scraped_at_utc": "2026-07-03T12:06:10Z",
+    "scraped_at_utc": "2026-07-03T17:54:10Z",
     "url": "https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807",
     "listing_id": 5022,
     "title": "Baton Rouge, LA Truck and Trailer Parking on 7802 Howell Blvd",
@@ -216,7 +216,7 @@
     "price_monthly_usd": "250.00"
   },
   "https://truckparkingclub.com/truck-parking/louisiana/denham-springs/8350-florida-boulevard-70726": {
-    "scraped_at_utc": "2026-07-03T12:06:10Z",
+    "scraped_at_utc": "2026-07-03T17:54:10Z",
     "url": "https://truckparkingclub.com/truck-parking/louisiana/denham-springs/8350-florida-boulevard-70726",
     "listing_id": 14792,
     "title": "Denham Springs, LA Bobtail and Box Truck Parking on 8350 Florida Boulevard",

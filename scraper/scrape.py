@@ -4,8 +4,10 @@
 Reads listing page URLs from urls.txt, queries the site's public listing API
 (the same one the listing page itself calls), and records the results:
 
-  data/history.csv  — one row per listing per run, appended over time
-  data/latest.json  — most recent snapshot per listing, overwritten each run
+  data/history.csv       — one row per listing per run, appended over time
+  data/latest.json       — most recent snapshot per listing, overwritten each run
+  data/listings/<slug>.csv — per-listing history, one file per URL, rebuilt
+                             from history.csv every run (so they always match)
 
 Uses only the Python standard library. Run: python3 scrape.py
 """
@@ -108,6 +110,29 @@ def fetch_listing(url: str, retries: int = 3) -> dict:
     raise last_err
 
 
+def listing_slug(url: str) -> str:
+    """Filename-safe identifier for a listing URL, e.g. 14015-florida-blvd-70819."""
+    m = URL_RE.search(url)
+    raw = f"{m['city']}-{m['details']}" if m else url
+    return re.sub(r"[^A-Za-z0-9_-]+", "-", raw).strip("-").lower()
+
+
+def write_per_listing_files(history_path: Path, listings_dir: Path) -> int:
+    """Rebuild one CSV per listing from history.csv so each URL has its own table."""
+    by_url: dict[str, list[dict]] = {}
+    with history_path.open(newline="") as f:
+        for row in csv.DictReader(f):
+            if row.get("url"):
+                by_url.setdefault(row["url"], []).append(row)
+    listings_dir.mkdir(exist_ok=True)
+    for url, rows in by_url.items():
+        with (listings_dir / f"{listing_slug(url)}.csv").open("w", newline="") as f:
+            writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS, extrasaction="ignore")
+            writer.writeheader()
+            writer.writerows(rows)
+    return len(by_url)
+
+
 def load_manual_spaces(history_path: Path) -> dict[str, str]:
     """Latest manually-entered total_spaces_manual per URL from history.csv.
 
@@ -199,7 +224,10 @@ def main() -> int:
 
     latest_path.write_text(json.dumps({r["url"]: r for r in rows}, indent=2) + "\n")
 
+    n_files = write_per_listing_files(history_path, data_dir / "listings")
+
     print(f"\n{len(rows) - failures}/{len(rows)} listings scraped -> {history_path}")
+    print(f"{n_files} per-listing tables -> {data_dir / 'listings'}/")
     return 1 if failures == len(rows) else 0
 
 
