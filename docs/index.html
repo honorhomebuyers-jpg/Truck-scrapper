@@ -67,6 +67,12 @@
     border: 1px solid var(--baseline); border-radius: 6px; padding: 5px 8px; max-width: 100%;
   }
   tr.avgrow td { border-top: 2px solid var(--baseline); border-bottom: none; font-weight: 650; }
+  tr.filterrow th { padding: 6px 10px 8px 0; }
+  tr.filterrow input, tr.filterrow select {
+    font: inherit; font-size: 13px; font-weight: 400; text-transform: none; letter-spacing: normal;
+    color: var(--ink); background: var(--surface); border: 1px solid var(--baseline);
+    border-radius: 6px; padding: 4px 7px; width: 100%; min-width: 130px; box-sizing: border-box;
+  }
   .rangebtns { display: flex; gap: 0; border: 1px solid var(--baseline); border-radius: 6px; overflow: hidden; }
   .rangebtns button {
     font: inherit; font-size: 12px; padding: 5px 10px; border: 0; cursor: pointer;
@@ -137,13 +143,18 @@
 
   <div class="card">
     <h2>Current snapshot</h2>
-    <p class="note">Latest scrape, per listing. Capacity is the hand-entered total or the highest availability ever observed (a floor), so occupancy is a lower bound until capacities are typed in. The bottom row averages the rates of whatever is filtered.</p>
-    <div class="filters">
-      <input id="snapSearch" type="search" placeholder="Search listings…" aria-label="Search listings">
-      <select id="snapCity" aria-label="Filter by city"></select>
-      <select id="snapType" aria-label="Filter by vehicle type"></select>
-    </div>
-    <div class="scroll"><table id="snapTable"></table></div>
+    <p class="note">Latest scrape, per listing. Filter with the boxes in the heading row — type a name or city, or pick a vehicle type. Capacity is the hand-entered total or the highest availability ever observed (a floor), so occupancy is a lower bound until capacities are typed in. The bottom row averages the rates of whatever is filtered.</p>
+    <div class="scroll"><table id="snapTable">
+      <thead>
+        <tr><th>Listing</th><th>Type</th><th class="num">Open</th><th class="num">Capacity</th><th class="num">Occupancy</th><th class="num">Day</th><th class="num">Week</th><th class="num">Month</th><th>Bookings</th><th class="num">Rating</th><th class="num">Reviews</th></tr>
+        <tr class="filterrow">
+          <th><input id="snapSearch" type="search" placeholder="Filter name / city…" aria-label="Filter listings"></th>
+          <th><select id="snapType" aria-label="Filter by vehicle type"></select></th>
+          <th colspan="9"></th>
+        </tr>
+      </thead>
+      <tbody id="snapBody"></tbody>
+    </table></div>
   </div>
 
   <div class="cols">
@@ -345,19 +356,16 @@
   let snapRows = [];
   function renderSnap() {
     const q = ($('snapSearch').value || '').trim().toLowerCase();
-    const city = $('snapCity').value, typ = $('snapType').value;
+    const typ = $('snapType').value;
     let rows = snapRows;
     if (q) rows = rows.filter(r => `${shortName(r.url)} ${r.full_address || ''} ${r.title || ''}`.toLowerCase().includes(q));
-    if (city) rows = rows.filter(r => (r.city || '') === city);
     if (typ) rows = rows.filter(r => (r.vehicle_type || '') === typ);
     rows = rows.slice().sort((a, b) => (num(b.occupancy_pct_est) ?? -1) - (num(a.occupancy_pct_est) ?? -1));
     const avgOf = col => {
       const v = rows.map(r => num(r[col])).filter(x => x != null);
       return v.length ? money((v.reduce((a, b) => a + b, 0) / v.length).toFixed(2)) : '—';
     };
-    $('snapTable').innerHTML =
-      `<tr><th>Listing</th><th>Type</th><th class="num">Open</th><th class="num">Capacity</th><th class="num">Occupancy</th>` +
-      `<th class="num">Day</th><th class="num">Week</th><th class="num">Month</th><th>Bookings</th><th class="num">Rating</th><th class="num">Reviews</th></tr>` +
+    $('snapBody').innerHTML =
       rows.map(r => {
         const occ = num(r.occupancy_pct_est);
         return `<tr><td><a href="${esc(r.url)}" style="color:inherit">${esc(shortName(r.url))}</a></td>` +
@@ -481,16 +489,14 @@
     currentDraw = drawChart;
     drawChart();
 
-    // snapshot table + filters (options rebuilt each load, choices kept)
+    // snapshot table + heading-row filters (options rebuilt each load, choices kept)
     snapRows = latestRows;
-    for (const [id, field, label] of [['snapCity', 'city', 'All cities'], ['snapType', 'vehicle_type', 'All vehicle types']]) {
-      const el = $(id), keep = el.value;
-      const opts = [...new Set(latestRows.map(r => r[field]).filter(Boolean))].sort();
-      el.innerHTML = `<option value="">${label}</option>` +
-        opts.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('');
-      if ([...el.options].some(o => o.value === keep)) el.value = keep;
-      el.onchange = renderSnap;
-    }
+    const typeEl = $('snapType'), keepType = typeEl.value;
+    const types = [...new Set(latestRows.map(r => r.vehicle_type).filter(Boolean))].sort();
+    typeEl.innerHTML = `<option value="">All types</option>` +
+      types.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+    if ([...typeEl.options].some(o => o.value === keepType)) typeEl.value = keepType;
+    typeEl.onchange = renderSnap;
     $('snapSearch').oninput = renderSnap;
     renderSnap();
 
