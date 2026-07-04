@@ -43,6 +43,12 @@
   .wrap { max-width: 1060px; margin: 0 auto; padding: 20px 16px 48px; }
   header h1 { font-size: 20px; margin: 0 0 2px; }
   header .sub { color: var(--ink-2); font-size: 13px; margin: 0 0 18px; }
+  #refreshBtn {
+    font: inherit; font-size: 12px; color: var(--series-1); background: none;
+    border: 1px solid var(--baseline); border-radius: 6px; padding: 2px 10px;
+    cursor: pointer; margin-left: 6px;
+  }
+  #refreshBtn:disabled { opacity: .5; cursor: wait; }
   .banner {
     display: none; background: var(--surface); border: 1px solid var(--border);
     border-radius: 8px; padding: 10px 14px; color: var(--ink-2); margin-bottom: 16px;
@@ -108,7 +114,7 @@
 <div class="wrap">
   <header>
     <h1>Truck Parking — Occupancy &amp; Bookings</h1>
-    <p class="sub" id="updated">Loading…</p>
+    <p class="sub"><span id="updated">Loading…</span> <button id="refreshBtn" title="Re-fetch the latest data">↻ Refresh</button></p>
   </header>
 
   <div class="banner" id="banner"></div>
@@ -199,7 +205,9 @@
   // ---- fetching + CSV parsing -------------------------------------------
   async function fetchText(path) {
     try {
-      const res = await fetch(RAW + path, {cache: 'no-store'});
+      // cache-busting query: raw.githubusercontent's CDN caches for ~5 min,
+      // so a manual refresh would otherwise return the same bytes.
+      const res = await fetch(`${RAW}${path}?cb=${Date.now()}`, {cache: 'no-store'});
       return res.ok ? await res.text() : null;
     } catch { return null; }
   }
@@ -328,17 +336,27 @@
   }
 
   // ---- main --------------------------------------------------------------
-  async function init() {
+  let rangeDays = 30, currentDraw = null, lastLoad = 0;
+  let rsz; addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => currentDraw && currentDraw(), 150); });
+
+  async function loadAll() {
+    lastLoad = Date.now();
+    $('refreshBtn').disabled = true;
+    try { await load(); } finally { $('refreshBtn').disabled = false; }
+  }
+
+  async function load() {
     await pickBranch();
     const [historyT, latestT, eventsT, reviewsT, marketsT] = await Promise.all([
       fetchText('data/history.csv'), fetchText('data/latest.json'),
       fetchText('data/events.csv'), fetchText('data/reviews.csv'),
       fetchText('markets.txt'),
     ]);
+    const banner = $('banner');
+    banner.style.display = 'none';
     if (!historyT) {
-      const b = $('banner');
-      b.style.display = 'block';
-      b.textContent = `No data found on branch "${BRANCH}" yet — the dashboard fills in after the first scheduled scrape lands there.`;
+      banner.style.display = 'block';
+      banner.textContent = `No data found on branch "${BRANCH}" yet — the dashboard fills in after the first scheduled scrape lands there.`;
     }
     const history = parseCSV(historyT).filter(r => r.url && !r.error);
     let latest = {}; try { latest = JSON.parse(latestT) || {}; } catch {}
@@ -347,9 +365,15 @@
 
     const latestRows = Object.values(latest).filter(r => r.url && !r.error);
     const lastTime = latestRows.map(r => r.scraped_at_utc).sort().pop();
+    const ageMs = lastTime ? Date.now() - +new Date(lastTime) : 0;
+    const ageTxt = ageMs >= 36e5 ? Math.round(ageMs / 36e5) + 'h' : Math.max(1, Math.round(ageMs / 6e4)) + 'min';
     $('updated').textContent = lastTime
-      ? `Last scrape: ${fmtDateTime(new Date(lastTime))} · ${latestRows.length} listings tracked · data branch: ${BRANCH}`
+      ? `Last scrape: ${fmtDateTime(new Date(lastTime))} (${ageTxt} ago) · ${latestRows.length} listings tracked · data branch: ${BRANCH}`
       : 'No snapshot yet.';
+    if (lastTime && ageMs > 3 * 36e5) {
+      banner.style.display = 'block';
+      banner.textContent = `⚠️ The newest data is ${ageTxt} old — the scraper normally runs every 2 hours, so collection may be behind or paused. Check the repository's Actions tab.`;
+    }
 
     // tiles
     const openNow = latestRows.reduce((a, r) => a + (num(r.total_available) ?? 0), 0);
@@ -369,12 +393,14 @@
     $('tiles').innerHTML = tiles.map(t =>
       `<div class="tile"><div class="v">${esc(t.v)}</div><div class="l">${esc(t.l)}</div><div class="d">${esc(t.d)}</div></div>`).join('');
 
-    // listing selector
+    // listing selector (keep the current choice across refreshes)
     const urls = [...new Set(history.map(r => r.url))];
-    $('listingSel').innerHTML = `<option value="">All listings (total)</option>` +
+    const selEl = $('listingSel');
+    const prevSel = selEl.value;
+    selEl.innerHTML = `<option value="">All listings (total)</option>` +
       urls.map(u => `<option value="${esc(u)}">${esc(shortName(u))}</option>`).join('');
+    if ([...selEl.options].some(o => o.value === prevSel)) selEl.value = prevSel;
 
-    let rangeDays = 30;
     const drawChart = () => {
       const sel = $('listingSel').value;
       const cut = rangeDays ? Date.now() - rangeDays * 864e5 : 0;
@@ -402,14 +428,15 @@
       if (cap.length) series.push({name: 'Capacity (est.)', color: css('--muted'), labelColor: css('--muted'), dash: '5 4', points: cap});
       renderLine($('lineChart'), $('lineLegend'), series);
     };
-    $('listingSel').addEventListener('change', drawChart);
-    $('rangeBtns').addEventListener('click', e => {
+    // on* properties (not addEventListener) so refreshes replace, not stack
+    selEl.onchange = drawChart;
+    $('rangeBtns').onclick = e => {
       const b = e.target.closest('button'); if (!b) return;
       rangeDays = +b.dataset.d;
       [...$('rangeBtns').children].forEach(x => x.classList.toggle('on', x === b));
       drawChart();
-    });
-    let rsz; addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(drawChart, 150); });
+    };
+    currentDraw = drawChart;
     drawChart();
 
     // snapshot table
@@ -488,14 +515,21 @@
         }).join('');
       mktEl.appendChild(box);
     }
-    mktEl.addEventListener('pointermove', e => {
+    mktEl.onpointermove = e => {
       const row = e.target.closest('.bar-row');
       if (row) showTip(esc(row.dataset.tip), e.clientX, e.clientY); else hideTip();
-    });
-    mktEl.addEventListener('pointerleave', hideTip);
+    };
+    mktEl.onpointerleave = hideTip;
   }
 
-  init();
+  $('refreshBtn').onclick = loadAll;
+  // Re-fetch when the page is brought back to the foreground (e.g. reopened
+  // from the iPhone home screen) and every 10 minutes while it stays open.
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && Date.now() - lastLoad > 60e3) loadAll();
+  });
+  setInterval(() => { if (!document.hidden) loadAll(); }, 10 * 60e3);
+  loadAll();
 })();
 </script>
 </body>
