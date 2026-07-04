@@ -67,6 +67,9 @@
     border: 1px solid var(--baseline); border-radius: 6px; padding: 5px 8px; max-width: 100%;
   }
   tr.avgrow td { border-top: 2px solid var(--baseline); border-bottom: none; font-weight: 650; }
+  #snapHeads th { cursor: pointer; user-select: none; -webkit-user-select: none; white-space: nowrap; }
+  #snapHeads th.sorted-asc::after { content: " ▲"; }
+  #snapHeads th.sorted-desc::after { content: " ▼"; }
   tr.filterrow th { padding: 6px 10px 8px 0; }
   tr.filterrow input, tr.filterrow select {
     font: inherit; font-size: 13px; font-weight: 400; text-transform: none; letter-spacing: normal;
@@ -143,10 +146,17 @@
 
   <div class="card">
     <h2>Current snapshot</h2>
-    <p class="note">Latest scrape, per listing. Filter with the boxes in the heading row — type a name or city, or pick a vehicle type. Capacity is the hand-entered total or the highest availability ever observed (a floor), so occupancy is a lower bound until capacities are typed in. The bottom row averages the rates of whatever is filtered.</p>
+    <p class="note">Latest scrape, per listing. Tap any column heading to sort by it (tap again to flip ▲/▼); filter with the boxes underneath — type a name or city, or pick a vehicle type. Capacity is the hand-entered total or the highest availability ever observed (a floor), so occupancy is a lower bound until capacities are typed in. The bottom row averages the rates of whatever is filtered.</p>
     <div class="scroll"><table id="snapTable">
       <thead>
-        <tr><th>Listing</th><th>Type</th><th class="num">Open</th><th class="num">Capacity</th><th class="num">Occupancy</th><th class="num">Day</th><th class="num">Week</th><th class="num">Month</th><th>Bookings</th><th class="num">Rating</th><th class="num">Reviews</th></tr>
+        <tr id="snapHeads">
+          <th data-sort="listing">Listing</th><th data-sort="type">Type</th>
+          <th class="num" data-sort="open">Open</th><th class="num" data-sort="capacity">Capacity</th>
+          <th class="num" data-sort="occupancy">Occupancy</th><th class="num" data-sort="day">Day</th>
+          <th class="num" data-sort="week">Week</th><th class="num" data-sort="month">Month</th>
+          <th data-sort="bookings">Bookings</th><th class="num" data-sort="rating">Rating</th>
+          <th class="num" data-sort="reviews">Reviews</th>
+        </tr>
         <tr class="filterrow">
           <th><input id="snapSearch" type="search" placeholder="Filter name / city…" aria-label="Filter listings"></th>
           <th><select id="snapType" aria-label="Filter by vehicle type"></select></th>
@@ -354,13 +364,47 @@
 
   // ---- snapshot table ----------------------------------------------------
   let snapRows = [];
+  // tap a heading to sort by it; tap again to flip direction
+  let sortKey = 'occupancy', sortDir = -1;
+  const SORT_GETTERS = {
+    listing:   r => shortName(r.url).toLowerCase(),
+    type:      r => (r.vehicle_type || '').toLowerCase() || null,
+    open:      r => num(r.total_available),
+    capacity:  r => num(r.capacity_est),
+    occupancy: r => num(r.occupancy_pct_est),
+    day:       r => num(r.price_daily_usd),
+    week:      r => num(r.price_weekly_usd),
+    month:     r => num(r.price_monthly_usd),
+    bookings:  r => { const n = parseInt(r.booking_amount_label); return Number.isFinite(n) ? n : null; },
+    rating:    r => num(r.review_rating),
+    reviews:   r => num(r.reviews_count),
+  };
+  document.querySelectorAll('#snapHeads th[data-sort]').forEach(th => {
+    th.onclick = () => {
+      const k = th.dataset.sort;
+      if (sortKey === k) sortDir = -sortDir;
+      else { sortKey = k; sortDir = (k === 'listing' || k === 'type') ? 1 : -1; }
+      renderSnap();
+    };
+  });
   function renderSnap() {
     const q = ($('snapSearch').value || '').trim().toLowerCase();
     const typ = $('snapType').value;
     let rows = snapRows;
     if (q) rows = rows.filter(r => `${shortName(r.url)} ${r.full_address || ''} ${r.title || ''}`.toLowerCase().includes(q));
     if (typ) rows = rows.filter(r => (r.vehicle_type || '') === typ);
-    rows = rows.slice().sort((a, b) => (num(b.occupancy_pct_est) ?? -1) - (num(a.occupancy_pct_est) ?? -1));
+    const get = SORT_GETTERS[sortKey];
+    rows = rows.slice().sort((a, b) => {
+      const va = get(a), vb = get(b);
+      if (va == null && vb == null) return 0;
+      if (va == null) return 1;   // blanks always sink to the bottom
+      if (vb == null) return -1;
+      return (typeof va === 'string' ? va.localeCompare(vb) : va - vb) * sortDir;
+    });
+    document.querySelectorAll('#snapHeads th[data-sort]').forEach(th => {
+      th.classList.toggle('sorted-asc', th.dataset.sort === sortKey && sortDir === 1);
+      th.classList.toggle('sorted-desc', th.dataset.sort === sortKey && sortDir === -1);
+    });
     const avgOf = col => {
       const v = rows.map(r => num(r[col])).filter(x => x != null);
       return v.length ? money((v.reduce((a, b) => a + b, 0) / v.length).toFixed(2)) : '—';
