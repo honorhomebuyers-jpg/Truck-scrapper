@@ -18,3 +18,8 @@ https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd
 
 # auto-discovered 2026-07-03 by market sweep
 https://truckparkingclub.com/truck-parking/louisiana/denham-springs/23286-springhill-dr-70726
+
+# auto-discovered 2026-07-04 by market sweep
+https://truckparkingclub.com/truck-parking/louisiana/port-allen/4747-river-road-70767
+https://truckparkingclub.com/truck-parking/louisiana/port-allen/1956-court-st-70767
+https://truckparkingclub.com/truck-parking/louisiana/port-allen/1467-court-st-70767
