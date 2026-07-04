@@ -84,6 +84,7 @@ CSV_COLUMNS = [
     "reviews_count",
     "review_rating",
     "latest_review_date",
+    "est_created_date",
     "available_seats_raw",
     "price_hourly_usd",
     "price_daily_usd",
@@ -299,6 +300,25 @@ def price_columns(listing: dict) -> dict[str, str]:
     for name, cents in best.items():
         cols[f"price_{name}_usd"] = f"{cents / 100:.2f}"
     return cols
+
+
+def est_created_date(listing: dict) -> str:
+    """Estimated listing creation date (YYYY-MM-DD), from its photos.
+
+    The API exposes no created-at field, but image filenames are epoch-ms
+    upload timestamps and owners upload photos when creating a listing, so
+    the earliest photo approximates the creation date. Sequential listing_ids
+    corroborate the ordering. Can drift later if an owner replaces all the
+    original photos.
+    """
+    stamps = []
+    for img in listing.get("images") or []:
+        name = img.rsplit("/", 1)[-1].split(".")[0]
+        if name.isdigit() and len(name) == 13:
+            stamps.append(int(name) / 1000)
+    if not stamps:
+        return ""
+    return datetime.fromtimestamp(min(stamps), timezone.utc).strftime("%Y-%m-%d")
 
 
 def plans_offered(listing: dict) -> str:
@@ -562,6 +582,7 @@ def to_row(
         "reviews_count": listing.get("reviews_count"),
         "review_rating": listing.get("average_ratings"),
         "latest_review_date": max(review_dates) if review_dates else "",
+        "est_created_date": est_created_date(listing),
         "available_seats_raw": json.dumps(
             listing.get("available_seats") or [], separators=(",", ":")
         ),
