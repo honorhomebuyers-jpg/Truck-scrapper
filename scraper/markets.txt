@@ -1,0 +1,7 @@
+# Whole-city market sweeps — one `<state-slug>/<city-slug>` per line.
+# Every listing in these cities is recorded each run in data/markets/, and any
+# listing not yet in urls.txt is auto-added there for full detail tracking.
+# Lines starting with "#" and blank lines are ignored.
+louisiana/baton-rouge
+louisiana/denham-springs
+louisiana/port-allen
