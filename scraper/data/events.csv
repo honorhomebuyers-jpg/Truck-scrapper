@@ -8,3 +8,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-07-03T20:41:14Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,booking_amount_label,,100+,,listing's total-bookings badge changed
 2026-07-04T02:48:57Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6903-cezanne-ave-70806,total_available,11,12,1,1 spot(s) freed (booking ended) since last run
 2026-07-04T02:48:57Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,6,5,-1,1 spot(s) newly occupied (booked) since last run
+2026-07-04T06:38:09Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/2392-e-smiley-ave-70806,total_available,4,5,1,1 spot(s) freed (booking ended) since last run
