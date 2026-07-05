@@ -60,6 +60,7 @@
   .tile .d { font-size: 12px; color: var(--muted); margin-top: 2px; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
   .card h2 { font-size: 14px; margin: 0 0 2px; }
+  .card .subhead { font-size: 13px; margin: 18px 0 2px; }
   .card .note { color: var(--muted); font-size: 12px; margin: 0 0 12px; }
   .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; }
   .filters select, .filters input[type=search] {
@@ -136,6 +137,9 @@
     </div>
     <div class="chartbox" id="lineChart"><div class="empty">Loading…</div></div>
     <div class="legend" id="lineLegend"></div>
+    <h3 class="subhead">Spots booked per week</h3>
+    <p class="note">Counted from availability drops between scrapes — a floor, not an exact count. Follows the listing selector above. Tracking began Jul 4, 2026, so early weeks are empty.</p>
+    <div class="chartbox" id="bookChart"></div>
   </div>
 
   <div class="card">
@@ -148,7 +152,8 @@
           <th class="num" data-sort="open">Open</th><th class="num" data-sort="capacity">Capacity</th>
           <th class="num" data-sort="occupancy">Occupancy</th><th class="num" data-sort="day">Day</th>
           <th class="num" data-sort="week">Week</th><th class="num" data-sort="month">Month</th>
-          <th data-sort="bookings">Bookings</th><th class="num" data-sort="rating">Rating</th>
+          <th data-sort="bookings">Bookings</th><th class="num" data-sort="booked30">Booked 30d</th>
+          <th class="num" data-sort="rating">Rating</th>
           <th class="num" data-sort="reviews">Reviews</th>
           <th class="num" data-sort="created">Created</th>
         </tr>
@@ -353,7 +358,7 @@
   }
 
   // ---- snapshot table ----------------------------------------------------
-  let snapRows = [];
+  let snapRows = [], eventsData = [], booked30 = {};
   // tap a heading to sort by it; tap again to flip direction
   let sortKey = 'occupancy', sortDir = -1;
   const SORT_GETTERS = {
@@ -366,6 +371,7 @@
     week:      r => num(r.price_weekly_usd),
     month:     r => num(r.price_monthly_usd),
     bookings:  r => { const n = parseInt(r.booking_amount_label); return Number.isFinite(n) ? n : null; },
+    booked30:  r => booked30[r.url] || 0,
     rating:    r => num(r.review_rating),
     reviews:   r => num(r.reviews_count),
     created:   r => r.est_created_date || null,
@@ -406,6 +412,7 @@
           `<td class="num${occ >= 50 ? ' occ-hi' : ''}">${occ != null ? occ.toFixed(0) + '%' : '—'}</td>` +
           `<td class="num">${money(r.price_daily_usd)}</td><td class="num">${money(r.price_weekly_usd)}</td><td class="num">${money(r.price_monthly_usd)}</td>` +
           `<td>${esc(r.booking_amount_label || '—')}</td>` +
+          `<td class="num">${booked30[r.url] || 0}</td>` +
           `<td class="num">${r.review_rating ? (+r.review_rating).toFixed(1) + '★' : '—'}</td>` +
           `<td class="num">${r.reviews_count || '—'}</td>` +
           `<td class="num">${r.est_created_date ? new Date(r.est_created_date).toLocaleDateString(undefined, {month: 'short', year: 'numeric'}) : '—'}</td></tr>`;
@@ -413,8 +420,53 @@
       (rows.length
         ? `<tr class="avgrow"><td colspan="5">Average · ${rows.length} listing${rows.length > 1 ? 's' : ''}</td>` +
           `<td class="num">${avgOf('price_daily_usd')}</td><td class="num">${avgOf('price_weekly_usd')}</td>` +
-          `<td class="num">${avgOf('price_monthly_usd')}</td><td colspan="4"></td></tr>`
-        : `<tr><td colspan="12" class="empty">No data yet.</td></tr>`);
+          `<td class="num">${avgOf('price_monthly_usd')}</td><td colspan="5"></td></tr>`
+        : `<tr><td colspan="13" class="empty">No data yet.</td></tr>`);
+  }
+
+  // ---- weekly bookings chart ----------------------------------------------
+  function drawBookings() {
+    const el = $('bookChart');
+    const sel = $('listingSel') ? $('listingSel').value : '';
+    const day = 864e5, weeks = 12;
+    const monday = t => { const d = new Date(t); const wd = (d.getUTCDay() + 6) % 7; d.setUTCHours(0, 0, 0, 0); return +d - wd * day; };
+    const w0 = monday(Date.now()) - (weeks - 1) * 7 * day;
+    const buckets = Array.from({length: weeks}, (_, i) => ({start: w0 + i * 7 * day, v: 0}));
+    let total = 0;
+    for (const e of eventsData) {
+      if (e.metric !== 'total_available' || +e.change >= 0) continue;
+      if (sel && e.url !== sel) continue;
+      const i = Math.floor((monday(+new Date(e.scraped_at_utc)) - w0) / (7 * day));
+      if (i >= 0 && i < weeks) { buckets[i].v += -+e.change; total += -+e.change; }
+    }
+    if (!total) {
+      el.innerHTML = '<div class="empty">No bookings detected in the last 12 weeks yet — this fills in as scrapes catch availability drops.</div>';
+      return;
+    }
+    const W = el.clientWidth || 900, H = 150, m = {t: 18, r: 8, b: 22, l: 8};
+    const max = Math.max(...buckets.map(b => b.v));
+    const slot = (W - m.l - m.r) / weeks, barW = Math.min(slot * 0.6, 46);
+    const y = v => m.t + (1 - v / max) * (H - m.t - m.b);
+    let s = `<svg viewBox="0 0 ${W} ${H}">`;
+    s += `<line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="${css('--baseline')}" stroke-width="1"/>`;
+    buckets.forEach((b, i) => {
+      const x = m.l + i * slot + (slot - barW) / 2;
+      const wk = new Date(b.start).toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+      if (b.v) {
+        s += `<rect x="${x.toFixed(1)}" y="${y(b.v).toFixed(1)}" width="${barW.toFixed(1)}" height="${(H - m.b - y(b.v)).toFixed(1)}"` +
+             ` rx="3" fill="${css('--series-1')}" data-tip="${b.v} spot(s) booked · week of ${wk}"/>`;
+        s += `<text x="${(x + barW / 2).toFixed(1)}" y="${(y(b.v) - 5).toFixed(1)}" text-anchor="middle" fill="${css('--ink-2')}" font-size="11" font-weight="600">${b.v}</text>`;
+      }
+      if (i % 2 === (weeks - 1) % 2) {
+        s += `<text x="${(x + barW / 2).toFixed(1)}" y="${H - 7}" text-anchor="middle" fill="${css('--muted')}" font-size="11">${wk}</text>`;
+      }
+    });
+    el.innerHTML = s + '</svg>';
+    el.onpointermove = e => {
+      const r = e.target.closest('[data-tip]');
+      if (r) showTip(esc(r.dataset.tip), e.clientX, e.clientY); else hideTip();
+    };
+    el.onpointerleave = hideTip;
   }
 
   // ---- main --------------------------------------------------------------
@@ -444,6 +496,14 @@
     let latest = {}; try { latest = JSON.parse(latestT) || {}; } catch {}
     const events = parseCSV(eventsT);
     const reviews = parseCSV(reviewsT);
+    eventsData = events;
+    const cut30 = Date.now() - 30 * 864e5;
+    booked30 = {};
+    for (const e of events) {
+      if (e.metric === 'total_available' && +e.change < 0 && +new Date(e.scraped_at_utc) > cut30) {
+        booked30[e.url] = (booked30[e.url] || 0) - +e.change;
+      }
+    }
 
     const latestRows = Object.values(latest).filter(r => r.url && !r.error);
     const lastTime = latestRows.map(r => r.scraped_at_utc).sort().pop();
@@ -511,15 +571,16 @@
       renderLine($('lineChart'), $('lineLegend'), series);
     };
     // on* properties (not addEventListener) so refreshes replace, not stack
-    selEl.onchange = drawChart;
+    const redrawCharts = () => { drawChart(); drawBookings(); };
+    selEl.onchange = redrawCharts;
     $('rangeBtns').onclick = e => {
       const b = e.target.closest('button'); if (!b) return;
       rangeDays = +b.dataset.d;
       [...$('rangeBtns').children].forEach(x => x.classList.toggle('on', x === b));
       drawChart();
     };
-    currentDraw = drawChart;
-    drawChart();
+    currentDraw = redrawCharts;
+    redrawCharts();
 
     // snapshot table
     snapRows = latestRows;
