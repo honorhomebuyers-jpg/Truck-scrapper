@@ -13,3 +13,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-07-05T05:51:11Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,2,3,1,1 spot(s) freed (booking ended) since last run
 2026-07-05T05:51:11Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/2392-e-smiley-ave-70806,total_available,6,7,1,1 spot(s) freed (booking ended) since last run
 2026-07-05T15:04:15Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,3,2,-1,1 spot(s) newly occupied (booked) since last run
+2026-07-05T18:55:03Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/2392-e-smiley-ave-70806,total_available,7,6,-1,1 spot(s) newly occupied (booked) since last run
