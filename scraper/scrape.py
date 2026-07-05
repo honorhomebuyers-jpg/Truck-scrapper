@@ -278,10 +278,17 @@ def total_seats(listing: dict) -> int:
 
 
 def vehicle_type_str(listing: dict) -> str:
-    return " & ".join(
-        VEHICLE_TYPES.get(v, f"type {v}")
-        for v in listing.get("vehicle_type_allowed") or []
-    )
+    codes = listing.get("vehicle_type_allowed") or []
+    if codes and all(c in VEHICLE_TYPES for c in codes):
+        return " & ".join(VEHICLE_TYPES[c] for c in codes)
+    # Some listings carry subtype codes (e.g. [2, 3]) not in the public map;
+    # the listing title states the vehicle type, so recover it from there.
+    title = listing.get("title") or ""
+    if "Truck and Trailer" in title or "Truck & Trailer" in title:
+        return VEHICLE_TYPES[0]
+    if "Bobtail" in title or "Box Truck" in title:
+        return VEHICLE_TYPES[1]
+    return " & ".join(VEHICLE_TYPES.get(c, f"type {c}") for c in codes)
 
 
 def price_columns(listing: dict) -> dict[str, str]:
