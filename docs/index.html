@@ -527,7 +527,7 @@
       : 'No snapshot yet.';
     if (lastTime && ageMs > 3 * 36e5) {
       banner.style.display = 'block';
-      banner.textContent = `⚠️ The newest data is ${ageTxt} old — the scraper normally runs every 2 hours, so collection may be behind or paused. Check the repository's Actions tab.`;
+      banner.textContent = `⚠️ The newest data is ${ageTxt} old — the scraper normally runs hourly (GitHub sometimes runs it late; that's normal up to a few hours). If this persists, check the repository's Actions tab.`;
     }
 
     // est. revenue (30d): occupied spot-days integrated from the snapshots,

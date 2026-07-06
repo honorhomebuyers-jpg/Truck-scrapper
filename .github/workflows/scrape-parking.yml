@@ -2,9 +2,11 @@ name: Scrape truck parking availability
 
 on:
   schedule:
-    # Every 2 hours, so short (hourly/daily) bookings are less likely to
-    # come and go unseen between snapshots. Edit this cron to change frequency.
-    - cron: "0 */2 * * *"
+    # Hourly, at :23 past. Minute 0 is GitHub's rush hour — scheduled runs
+    # there get delayed or skipped under load (we saw 4h gaps), so an odd
+    # minute keeps the cadence steady, and hourly firing means one skipped
+    # slot costs 1h of gap, not 4. Edit this cron to change frequency.
+    - cron: "23 * * * *"
   workflow_dispatch: {}
 
 permissions:

@@ -103,9 +103,11 @@ python3 scraper/scrape.py
 
 ## Scheduling
 
-`.github/workflows/scrape-parking.yml` runs the scraper **every 2 hours** on
+`.github/workflows/scrape-parking.yml` runs the scraper **hourly (at :23)** on
 GitHub Actions and commits any new data back to the repository. Edit the `cron`
-line to change the frequency. The tighter the cadence, the fewer short
+line to change the frequency. The odd minute avoids GitHub's top-of-the-hour
+congestion, which delays or skips scheduled runs; hourly firing keeps gaps
+short even when a slot is dropped. The tighter the cadence, the fewer short
 (hourly/daily) bookings can start *and* end unseen between snapshots.
 
 Notes:
