@@ -49,6 +49,12 @@
     cursor: pointer; margin-left: 6px;
   }
   #refreshBtn:disabled { opacity: .5; cursor: wait; }
+  #activeToggle {
+    font: inherit; font-size: 12px; font-weight: 400; color: var(--ink-2); background: none;
+    border: 1px solid var(--baseline); border-radius: 999px; padding: 2px 12px;
+    cursor: pointer; margin-left: 8px; vertical-align: 2px;
+  }
+  #activeToggle.on { background: var(--series-1); border-color: var(--series-1); color: #fff; }
   .banner {
     display: none; background: var(--surface); border: 1px solid var(--border);
     border-radius: 8px; padding: 10px 14px; color: var(--ink-2); margin-bottom: 16px;
@@ -145,8 +151,8 @@
   </div>
 
   <div class="card">
-    <h2>Current snapshot</h2>
-    <details class="note"><summary>About · tap a heading to sort</summary><p>Latest scrape, per listing. Tap any column heading to sort by it; tap again to flip ▲/▼. Capacity is the hand-entered total or the highest availability ever observed (a floor), so occupancy is a lower bound until capacities are typed in. Created is estimated from the listing's earliest photo upload. Est rev 30d = occupied spot-days over the last 30 days × the lot's long-stay rate (monthly ÷ 30) — a floor that fills in as tracking matures. The bottom row averages the day/week/month rates.</p></details>
+    <h2>Current snapshot <button id="activeToggle" title="Show only listings with someone parked now or booking activity in the last 30 days">Active only</button></h2>
+    <details class="note"><summary>About · tap a heading to sort</summary><p>The Active only toggle hides listings with no one parked and no booking activity detected in the last 30 days. Latest scrape, per listing. Tap any column heading to sort by it; tap again to flip ▲/▼. Capacity is the hand-entered total or the highest availability ever observed (a floor), so occupancy is a lower bound until capacities are typed in. Created is estimated from the listing's earliest photo upload. Est rev 30d = occupied spot-days over the last 30 days × the lot's long-stay rate (monthly ÷ 30) — a floor that fills in as tracking matures. The bottom row averages the day/week/month rates.</p></details>
     <div class="scroll"><table id="snapTable">
       <thead>
         <tr id="snapHeads">
@@ -362,6 +368,18 @@
 
   // ---- snapshot table ----------------------------------------------------
   let snapRows = [], eventsData = [], booked30 = {}, rev30 = {};
+  // "Active only": listings with someone parked now, or any availability
+  // movement (booking started or ended) in the last 30 days.
+  let activeOnly = false;
+  const active30 = new Set();
+  $('activeToggle').onclick = () => {
+    activeOnly = !activeOnly;
+    $('activeToggle').classList.toggle('on', activeOnly);
+    renderSnap();
+  };
+  function isActive(r) {
+    return (num(r.occupied_est) || 0) > 0 || (booked30[r.url] || 0) > 0 || active30.has(r.url);
+  }
 
   // Long-stay per-day rate: what one occupied spot earns per day, assuming
   // the cheapest (longest-plan) rate — monthly/30, else weekly/7, else daily.
@@ -399,7 +417,7 @@
     };
   });
   function renderSnap() {
-    let rows = snapRows;
+    let rows = activeOnly ? snapRows.filter(isActive) : snapRows;
     const get = SORT_GETTERS[sortKey];
     rows = rows.slice().sort((a, b) => {
       const va = get(a), vb = get(b);
@@ -436,7 +454,7 @@
         ? `<tr class="avgrow"><td colspan="5">Average · ${rows.length} listing${rows.length > 1 ? 's' : ''}</td>` +
           `<td class="num">${avgOf('price_daily_usd')}</td><td class="num">${avgOf('price_weekly_usd')}</td>` +
           `<td class="num">${avgOf('price_monthly_usd')}</td><td colspan="6"></td></tr>`
-        : `<tr><td colspan="14" class="empty">No data yet.</td></tr>`);
+        : `<tr><td colspan="14" class="empty">${activeOnly ? 'No listings with recent booking activity yet.' : 'No data yet.'}</td></tr>`);
   }
 
   // ---- weekly bookings chart ----------------------------------------------
@@ -538,10 +556,11 @@
     eventsData = events;
     const cut30 = Date.now() - 30 * 864e5;
     booked30 = {};
+    active30.clear();
     for (const e of events) {
-      if (e.metric === 'total_available' && +e.change < 0 && +new Date(e.scraped_at_utc) > cut30) {
-        booked30[e.url] = (booked30[e.url] || 0) - +e.change;
-      }
+      if (e.metric !== 'total_available' || +new Date(e.scraped_at_utc) <= cut30) continue;
+      active30.add(e.url);
+      if (+e.change < 0) booked30[e.url] = (booked30[e.url] || 0) - +e.change;
     }
 
     const latestRows = Object.values(latest).filter(r => r.url && !r.error);
