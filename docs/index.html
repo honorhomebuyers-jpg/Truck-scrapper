@@ -62,6 +62,8 @@
   .card h2 { font-size: 14px; margin: 0 0 2px; }
   .card .subhead { font-size: 13px; margin: 18px 0 2px; }
   .card .note { color: var(--muted); font-size: 12px; margin: 0 0 12px; }
+  details.note summary { cursor: pointer; user-select: none; -webkit-user-select: none; }
+  details.note p { margin: 4px 0 0; }
   .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; }
   .filters select, .filters input[type=search] {
     font: inherit; color: var(--ink); background: var(--surface);
@@ -128,7 +130,7 @@
 
   <div class="card">
     <h2>Available spots over time</h2>
-    <p class="note">Sum across tracked listings, one point per scrape. A drop means spots were booked; a rise means bookings ended.</p>
+    <details class="note"><summary>About</summary><p>Sum across tracked listings, one point per scrape. A drop means spots were booked; a rise means bookings ended.</p></details>
     <div class="filters">
       <select id="listingSel" aria-label="Listing"></select>
       <div class="rangebtns" id="rangeBtns" role="group" aria-label="Date range">
@@ -138,13 +140,13 @@
     <div class="chartbox" id="lineChart"><div class="empty">Loading…</div></div>
     <div class="legend" id="lineLegend"></div>
     <h3 class="subhead">Spots booked per week</h3>
-    <p class="note">Counted from availability drops between scrapes — a floor, not an exact count. Follows the listing selector above. Tracking began Jul 4, 2026, so early weeks are empty.</p>
+    <details class="note"><summary>About</summary><p>Counted from availability drops between scrapes — a floor, not an exact count. Follows the listing selector above. Tracking began Jul 4, 2026, so early weeks are empty.</p></details>
     <div class="chartbox" id="bookChart"></div>
   </div>
 
   <div class="card">
     <h2>Current snapshot</h2>
-    <p class="note">Latest scrape, per listing. Tap any column heading to sort by it; tap again to flip ▲/▼. Capacity is the hand-entered total or the highest availability ever observed (a floor), so occupancy is a lower bound until capacities are typed in. Created is estimated from the listing's earliest photo upload. Est rev 30d = occupied spot-days over the last 30 days × the lot's long-stay rate (monthly ÷ 30) — a floor that fills in as tracking matures. The bottom row averages the day/week/month rates.</p>
+    <details class="note"><summary>About · tap a heading to sort</summary><p>Latest scrape, per listing. Tap any column heading to sort by it; tap again to flip ▲/▼. Capacity is the hand-entered total or the highest availability ever observed (a floor), so occupancy is a lower bound until capacities are typed in. Created is estimated from the listing's earliest photo upload. Est rev 30d = occupied spot-days over the last 30 days × the lot's long-stay rate (monthly ÷ 30) — a floor that fills in as tracking matures. The bottom row averages the day/week/month rates.</p></details>
     <div class="scroll"><table id="snapTable">
       <thead>
         <tr id="snapHeads">
@@ -166,19 +168,19 @@
   <div class="cols">
     <div class="card">
       <h2>Booking activity</h2>
-      <p class="note">Run-over-run changes from <code>events.csv</code>. Newest first.</p>
+      <details class="note"><summary>About</summary><p>Run-over-run changes from <code>events.csv</code>. Newest first.</p></details>
       <ul class="feed" id="eventsFeed"><li class="empty">Loading…</li></ul>
     </div>
     <div class="card">
-      <h2>Recent reviews <span style="font-weight:400;color:var(--muted)">(each = one completed booking)</span></h2>
-      <p class="note">Every review is tied to a booking id — dated proof of bookings.</p>
+      <h2>Recent reviews</h2>
+      <details class="note"><summary>About</summary><p>Every review is tied to a booking id, so each one is dated proof of a completed booking.</p></details>
       <ul class="feed" id="reviewsFeed"><li class="empty">Loading…</li></ul>
     </div>
   </div>
 
   <div class="card">
     <h2>Markets — availability by listing</h2>
-    <p class="note">Every listing in each swept city, latest run. Open spots per listing; label direct on the row.</p>
+    <details class="note"><summary>About</summary><p>Every listing in each swept city, latest run. Open spots per listing; label direct on the row.</p></details>
     <div id="markets"><div class="empty">Loading…</div></div>
   </div>
 
@@ -482,6 +484,30 @@
     el.onpointerleave = hideTip;
   }
 
+  // ---- header freshness readout -------------------------------------------
+  // Re-rendered every minute so the "(x ago)" age can never silently go stale
+  // while the page sits open.
+  let hdr = null;
+  function updateHeader() {
+    if (!hdr) return;
+    const banner = $('banner');
+    if (!hdr.lastTime) { $('updated').textContent = 'No snapshot yet.'; return; }
+    const age = Date.now() - +new Date(hdr.lastTime);
+    const ageTxt = age >= 36e5 ? Math.round(age / 36e5) + 'h' : Math.max(1, Math.round(age / 6e4)) + 'min';
+    const checked = new Date(lastLoad).toLocaleTimeString(undefined, {hour: 'numeric', minute: '2-digit'});
+    $('updated').textContent =
+      `Last scrape: ${fmtDateTime(new Date(hdr.lastTime))} (${ageTxt} ago) · page checked at ${checked} · ${hdr.n} listings tracked · data branch: ${BRANCH}`;
+    const stale = age > 3 * 36e5;
+    if (stale) {
+      banner.style.display = 'block';
+      banner.textContent = `⚠️ The newest data is ${ageTxt} old — the scraper normally runs hourly (GitHub sometimes runs it late; that's normal up to a few hours). Tap ↻ Refresh first; if it persists, check the repository's Actions tab.`;
+    } else if (banner.dataset.stale) {
+      banner.style.display = 'none';
+    }
+    banner.dataset.stale = stale ? '1' : '';
+  }
+  setInterval(updateHeader, 60e3);
+
   // ---- main --------------------------------------------------------------
   let rangeDays = 30, currentDraw = null, lastLoad = 0;
   let rsz; addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => currentDraw && currentDraw(), 150); });
@@ -519,16 +545,8 @@
     }
 
     const latestRows = Object.values(latest).filter(r => r.url && !r.error);
-    const lastTime = latestRows.map(r => r.scraped_at_utc).sort().pop();
-    const ageMs = lastTime ? Date.now() - +new Date(lastTime) : 0;
-    const ageTxt = ageMs >= 36e5 ? Math.round(ageMs / 36e5) + 'h' : Math.max(1, Math.round(ageMs / 6e4)) + 'min';
-    $('updated').textContent = lastTime
-      ? `Last scrape: ${fmtDateTime(new Date(lastTime))} (${ageTxt} ago) · ${latestRows.length} listings tracked · data branch: ${BRANCH}`
-      : 'No snapshot yet.';
-    if (lastTime && ageMs > 3 * 36e5) {
-      banner.style.display = 'block';
-      banner.textContent = `⚠️ The newest data is ${ageTxt} old — the scraper normally runs hourly (GitHub sometimes runs it late; that's normal up to a few hours). If this persists, check the repository's Actions tab.`;
-    }
+    hdr = {lastTime: latestRows.map(r => r.scraped_at_utc).sort().pop(), n: latestRows.length};
+    updateHeader();
 
     // est. revenue (30d): occupied spot-days integrated from the snapshots,
     // times each listing's long-stay per-day rate. A floor on two counts:
