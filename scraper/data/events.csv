@@ -28,3 +28,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-07-08T18:50:34Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd-70809,total_available,2,1,-1,1 spot(s) newly occupied (booked) since last run
 2026-07-09T05:16:16Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,6,7,1,1 spot(s) freed (booking ended) since last run
 2026-07-09T05:16:16Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd-70809,total_available,1,2,1,1 spot(s) freed (booking ended) since last run
+2026-07-09T08:48:55Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,7,6,-1,1 spot(s) newly occupied (booked) since last run
