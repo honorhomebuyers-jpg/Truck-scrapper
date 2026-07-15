@@ -23,3 +23,6 @@ https://truckparkingclub.com/truck-parking/louisiana/denham-springs/23286-spring
 https://truckparkingclub.com/truck-parking/louisiana/port-allen/4747-river-road-70767
 https://truckparkingclub.com/truck-parking/louisiana/port-allen/1956-court-st-70767
 https://truckparkingclub.com/truck-parking/louisiana/port-allen/1467-court-st-70767
+
+# auto-discovered 2026-07-15 by market sweep
+https://truckparkingclub.com/truck-parking/louisiana/denham-springs/26542-louisiana-1032-70726
