@@ -56,3 +56,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-07-15T03:40:34Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/1467-court-st-70767,total_available,10,9,-1,1 spot(s) newly occupied (booked) since last run
 2026-07-15T14:15:01Z,https://truckparkingclub.com/truck-parking/louisiana/denham-springs/8350-florida-boulevard-70726,total_available,4,5,1,1 spot(s) freed (booking ended) since last run
 2026-07-15T19:40:14Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,2,3,1,1 spot(s) freed (booking ended) since last run
+2026-07-15T22:16:52Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,4,5,1,1 spot(s) freed (booking ended) since last run
