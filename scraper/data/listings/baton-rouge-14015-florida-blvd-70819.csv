@@ -174,3 +174,4 @@ scraped_at_utc,full_address,vehicle_type,total_available,total_spaces_manual,cap
 2026-07-18T19:36:05Z,"14015 Florida Blvd, Baton Rouge, LA 70819",Truck + Trailer,0,,7,7,100.0,100+,10.00,50.00,190.00,26,4
 2026-07-18T21:08:29Z,"14015 Florida Blvd, Baton Rouge, LA 70819",Truck + Trailer,0,,7,7,100.0,100+,10.00,50.00,190.00,26,4
 2026-07-18T22:10:08Z,"14015 Florida Blvd, Baton Rouge, LA 70819",Truck + Trailer,0,,7,7,100.0,100+,10.00,50.00,190.00,26,4
+2026-07-18T23:13:56Z,"14015 Florida Blvd, Baton Rouge, LA 70819",Truck + Trailer,1,,7,6,85.7,100+,10.00,50.00,190.00,26,4
