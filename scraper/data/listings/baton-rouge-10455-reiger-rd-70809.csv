@@ -192,3 +192,4 @@ scraped_at_utc,full_address,vehicle_type,total_available,total_spaces_manual,cap
 2026-07-20T11:16:45Z,"10455 Reiger Rd, Baton Rouge, LA 70809",Truck + Trailer,2,,2,0,0.0,100+,12.00,60.00,280.00,11,4.18
 2026-07-20T13:19:55Z,"10455 Reiger Rd, Baton Rouge, LA 70809",Truck + Trailer,2,,2,0,0.0,100+,12.00,60.00,280.00,11,4.18
 2026-07-20T15:23:39Z,"10455 Reiger Rd, Baton Rouge, LA 70809",Truck + Trailer,2,,2,0,0.0,100+,12.00,60.00,280.00,11,4.18
+2026-07-20T18:24:10Z,"10455 Reiger Rd, Baton Rouge, LA 70809",Truck + Trailer,1,,2,1,50.0,100+,12.00,60.00,280.00,11,4.18
