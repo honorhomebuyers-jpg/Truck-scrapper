@@ -94,3 +94,6 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-07-21T23:15:07Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,4,3,-1,1 spot(s) newly occupied (booked) since last run
 2026-07-22T09:42:18Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,3,4,1,1 spot(s) freed (booking ended) since last run
 2026-07-22T14:29:26Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,4,3,-1,1 spot(s) newly occupied (booked) since last run
+2026-07-22T16:52:19Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/4747-river-road-70767,price_daily_usd,20.00,15.00,,
+2026-07-22T16:52:19Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/4747-river-road-70767,price_weekly_usd,80.00,60.00,,
+2026-07-22T16:52:19Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/4747-river-road-70767,price_monthly_usd,200.00,150.00,,
