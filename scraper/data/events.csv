@@ -138,3 +138,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-07-29T19:48:14Z,https://truckparkingclub.com/truck-parking/louisiana/denham-springs/23286-springhill-dr-70726,price_monthly_usd,230.00,150.00,,
 2026-07-30T06:45:12Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,5,4,-1,1 spot(s) newly occupied (booked) since last run
 2026-07-30T09:46:01Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd-70809,total_available,0,1,1,1 spot(s) freed (booking ended) since last run
+2026-07-30T18:50:42Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/1467-court-st-70767,total_available,10,6,-4,4 spot(s) newly occupied (booked) since last run
