@@ -237,3 +237,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-08-22T01:53:36Z,https://truckparkingclub.com/truck-parking/louisiana/denham-springs/23286-springhill-dr-70726,total_available,1,2,1,1 spot(s) freed (booking ended) since last run
 2026-08-22T03:10:34Z,https://truckparkingclub.com/truck-parking/louisiana/denham-springs/23286-springhill-dr-70726,total_available,2,1,-1,1 spot(s) newly occupied (booked) since last run
 2026-08-22T14:41:52Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,3,2,-1,1 spot(s) newly occupied (booked) since last run
+2026-08-22T17:40:14Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/1956-court-st-70767,total_available,50,49,-1,1 spot(s) newly occupied (booked) since last run
