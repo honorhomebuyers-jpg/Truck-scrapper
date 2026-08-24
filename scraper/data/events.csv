@@ -248,3 +248,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-08-23T23:39:36Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/1467-court-st-70767,booking_amount_label,,10+,,listing's total-bookings badge changed
 2026-08-24T02:00:16Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,2,3,1,1 spot(s) freed (booking ended) since last run
 2026-08-24T15:04:10Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/1956-court-st-70767,total_available,49,48,-1,1 spot(s) newly occupied (booked) since last run
+2026-08-24T17:50:23Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,5,4,-1,1 spot(s) newly occupied (booked) since last run
