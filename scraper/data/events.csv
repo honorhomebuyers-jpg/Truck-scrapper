@@ -261,3 +261,5 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-08-26T02:01:39Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/1467-court-st-70767,total_available,8,9,1,1 spot(s) freed (booking ended) since last run
 2026-08-26T04:58:57Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/1467-court-st-70767,total_available,9,10,1,1 spot(s) freed (booking ended) since last run
 2026-08-26T13:27:04Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,5,4,-1,1 spot(s) newly occupied (booked) since last run
+2026-08-26T20:11:52Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6903-cezanne-ave-70806,price_weekly_usd,41.00,36.00,,
+2026-08-26T20:11:52Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6903-cezanne-ave-70806,price_monthly_usd,130.00,80.00,,
