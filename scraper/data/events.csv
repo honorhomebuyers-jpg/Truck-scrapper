@@ -267,3 +267,6 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-08-27T09:58:38Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6405-scenic-hwy-70807,total_available,2,3,1,1 spot(s) freed (booking ended) since last run
 2026-08-27T20:35:15Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,3,4,1,1 spot(s) freed (booking ended) since last run
 2026-08-27T20:35:15Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,3,4,1,1 spot(s) freed (booking ended) since last run
+2026-08-28T18:49:18Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,4,5,1,1 spot(s) freed (booking ended) since last run
+2026-08-28T18:49:18Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,4,3,-1,1 spot(s) newly occupied (booked) since last run
+2026-08-28T18:49:18Z,https://truckparkingclub.com/truck-parking/louisiana/denham-springs/23286-springhill-dr-70726,total_available,1,0,-1,1 spot(s) newly occupied (booked) since last run
