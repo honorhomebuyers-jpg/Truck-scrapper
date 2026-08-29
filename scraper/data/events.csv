@@ -275,3 +275,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-08-29T02:17:16Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/4747-river-road-70767,total_available,15,14,-1,1 spot(s) newly occupied (booked) since last run
 2026-08-29T09:09:09Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd-70809,total_available,2,1,-1,1 spot(s) newly occupied (booked) since last run
 2026-08-29T14:33:24Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,6,5,-1,1 spot(s) newly occupied (booked) since last run
+2026-08-29T18:38:02Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,5,3,-2,2 spot(s) newly occupied (booked) since last run
