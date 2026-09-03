@@ -293,3 +293,5 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-09-02T18:46:51Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,4,3,-1,1 spot(s) newly occupied (booked) since last run
 2026-09-02T21:52:36Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,3,4,1,1 spot(s) freed (booking ended) since last run
 2026-09-03T04:43:04Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,4,3,-1,1 spot(s) newly occupied (booked) since last run
+2026-09-03T18:44:47Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,6,7,1,1 spot(s) freed (booking ended) since last run
+2026-09-03T18:44:47Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/1467-court-st-70767,total_available,10,9,-1,1 spot(s) newly occupied (booked) since last run
