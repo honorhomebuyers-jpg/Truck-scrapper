@@ -370,3 +370,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-09-19T01:16:22Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/2392-e-smiley-ave-70806,total_available,8,7,-1,1 spot(s) newly occupied (booked) since last run
 2026-09-19T11:10:18Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6405-scenic-hwy-70807,total_available,2,1,-1,1 spot(s) newly occupied (booked) since last run
 2026-09-19T11:10:18Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,4,3,-1,1 spot(s) newly occupied (booked) since last run
+2026-09-20T01:17:02Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/2392-e-smiley-ave-70806,total_available,7,8,1,1 spot(s) freed (booking ended) since last run
