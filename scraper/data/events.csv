@@ -380,3 +380,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-09-22T07:46:38Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,0,1,1,1 spot(s) freed (booking ended) since last run
 2026-09-23T00:40:47Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/17912-sotile-dr-70809,total_available,2,3,1,1 spot(s) freed (booking ended) since last run
 2026-09-23T06:04:53Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/1956-court-st-70767,total_available,49,48,-1,1 spot(s) newly occupied (booked) since last run
+2026-09-23T11:48:54Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6405-scenic-hwy-70807,total_available,1,2,1,1 spot(s) freed (booking ended) since last run
