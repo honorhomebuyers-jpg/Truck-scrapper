@@ -385,3 +385,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-09-24T05:01:49Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,3,2,-1,1 spot(s) newly occupied (booked) since last run
 2026-09-24T05:01:49Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/1956-court-st-70767,total_available,48,49,1,1 spot(s) freed (booking ended) since last run
 2026-09-25T07:57:14Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,2,3,1,1 spot(s) freed (booking ended) since last run
+2026-09-25T22:28:54Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,3,2,-1,1 spot(s) newly occupied (booked) since last run
