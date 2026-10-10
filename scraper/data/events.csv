@@ -439,3 +439,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-10-08T22:10:57Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/2392-e-smiley-ave-70806,total_available,5,6,1,1 spot(s) freed (booking ended) since last run
 2026-10-09T02:16:36Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/2392-e-smiley-ave-70806,total_available,6,7,1,1 spot(s) freed (booking ended) since last run
 2026-10-09T02:16:36Z,https://truckparkingclub.com/truck-parking/louisiana/denham-springs/23286-springhill-dr-70726,total_available,0,1,1,1 spot(s) freed (booking ended) since last run
+2026-10-10T00:58:34Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,6,5,-1,1 spot(s) newly occupied (booked) since last run
