@@ -473,3 +473,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-10-18T20:53:07Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,5,6,1,1 spot(s) freed (booking ended) since last run
 2026-10-18T23:21:03Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,6,5,-1,1 spot(s) newly occupied (booked) since last run
 2026-10-19T21:08:19Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,5,4,-1,1 spot(s) newly occupied (booked) since last run
+2026-10-20T00:26:01Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,4,5,1,1 spot(s) freed (booking ended) since last run
