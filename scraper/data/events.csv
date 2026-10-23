@@ -489,3 +489,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-10-22T07:43:22Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/17912-sotile-dr-70809,total_available,2,3,1,1 spot(s) freed (booking ended) since last run
 2026-10-22T13:53:46Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/2392-e-smiley-ave-70806,total_available,7,6,-1,1 spot(s) newly occupied (booked) since last run
 2026-10-22T22:27:20Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,4,3,-1,1 spot(s) newly occupied (booked) since last run
+2026-10-23T01:37:06Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,3,2,-1,1 spot(s) newly occupied (booked) since last run
