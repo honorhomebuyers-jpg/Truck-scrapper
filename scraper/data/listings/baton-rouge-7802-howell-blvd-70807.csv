@@ -1069,3 +1069,4 @@ scraped_at_utc,full_address,vehicle_type,total_available,total_spaces_manual,cap
 2026-10-23T07:41:06Z,"7802 Howell Blvd, Baton Rouge, LA 70807",Truck + Trailer,1,,7,6,85.7,100+,15.00,75.00,250.00,23,4.61
 2026-10-23T13:34:26Z,"7802 Howell Blvd, Baton Rouge, LA 70807",Truck + Trailer,1,,7,6,85.7,100+,15.00,75.00,250.00,23,4.61
 2026-10-23T18:27:59Z,"7802 Howell Blvd, Baton Rouge, LA 70807",Truck + Trailer,1,,7,6,85.7,100+,15.00,75.00,250.00,23,4.61
+2026-10-23T22:20:00Z,"7802 Howell Blvd, Baton Rouge, LA 70807",Truck + Trailer,0,,7,7,100.0,100+,15.00,75.00,250.00,23,4.61
