@@ -494,3 +494,4 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-10-23T18:27:59Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd-70809,total_available,1,0,-1,1 spot(s) newly occupied (booked) since last run
 2026-10-23T22:20:00Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6405-scenic-hwy-70807,total_available,3,2,-1,1 spot(s) newly occupied (booked) since last run
 2026-10-23T22:20:00Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,1,0,-1,1 spot(s) newly occupied (booked) since last run
+2026-10-24T00:48:56Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/7802-howell-blvd-70807,total_available,0,1,1,1 spot(s) freed (booking ended) since last run
