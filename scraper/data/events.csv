@@ -547,3 +547,5 @@ scraped_at_utc,url,metric,previous,current,change,note
 2026-11-04T22:40:40Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/6405-scenic-hwy-70807,total_available,2,3,1,1 spot(s) freed (booking ended) since last run
 2026-11-05T20:42:28Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd-70809,total_available,1,2,1,1 spot(s) freed (booking ended) since last run
 2026-11-06T01:37:31Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/10455-reiger-rd-70809,total_available,2,1,-1,1 spot(s) newly occupied (booked) since last run
+2026-11-06T17:33:06Z,https://truckparkingclub.com/truck-parking/louisiana/baton-rouge/14015-florida-blvd-70819,total_available,5,4,-1,1 spot(s) newly occupied (booked) since last run
+2026-11-06T17:33:06Z,https://truckparkingclub.com/truck-parking/louisiana/port-allen/1467-court-st-70767,total_available,8,9,1,1 spot(s) freed (booking ended) since last run
